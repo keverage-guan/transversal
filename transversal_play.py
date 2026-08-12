@@ -1,4 +1,6 @@
 """
+transversal_play.py
+
 Interactive transversal achievement game.
 
 Usage:
@@ -21,7 +23,10 @@ GRID_COLOR = "#333333"
 
 
 class Game:
+    """Manages board state, rendering, and win detection for the transversal game."""
+
     def __init__(self, n):
+        """Set up the n x n board, draw the grid, and wire up the click handler."""
         self.n = n
         self.board = [[None for _ in range(n)] for _ in range(n)]
         self.moves = []
@@ -68,6 +73,7 @@ class Game:
         )
 
     def click(self, event):
+        """Translate a mouse click into board coordinates and play a move if valid."""
         if event.inaxes != self.ax:
             return
 
@@ -83,7 +89,7 @@ class Game:
         self.play(r, c)
 
     def play(self, r, c):
-
+        """Place the current player's mark at (r, c), check for a win, and advance the turn."""
         who = self.turn
 
         self.count[who] += 1
@@ -144,8 +150,8 @@ class Game:
 
         self.fig.canvas.draw_idle()
 
-
     def check_win(self):
+        """Return True if X's marks contain a full transversal (a perfect matching)."""
         rowmask = [0] * self.n
 
         for r in range(self.n):
@@ -153,15 +159,15 @@ class Game:
                 if self.board[r][c] == "X":
                     rowmask[r] |= 1 << c
 
+        # A win requires a matching that covers every row, i.e. size == n.
         if max_matching(tuple(rowmask), self.n)[0] == self.n:
             self.winning_cells = self.winning_transversal()
             return True
 
         return False
 
-
     def winning_transversal(self):
-
+        """Compute and return the list of (row, col) cells forming X's winning transversal."""
         rowmask = [0] * self.n
 
         for r in range(self.n):
@@ -183,7 +189,7 @@ class Game:
         ]
 
     def highlight_win(self):
-
+        """Draw a black outline around each cell in the winning transversal."""
         cells = self.winning_transversal()
 
         for r,c in cells:
@@ -200,7 +206,9 @@ class Game:
 
         self.fig.canvas.draw_idle()
 
+
 def max_matching(rowmask, n):
+    """Find a maximum bipartite matching between rows and columns using augmenting paths."""
     match_row = [-1] * n
     match_col = [-1] * n
     size = 0
@@ -213,7 +221,7 @@ def max_matching(rowmask, n):
 
 
 def try_augment(r, rowmask, match_row, match_col, n, seen):
-
+    """Attempt to find an augmenting path from row r, extending the matching in place."""
     m = rowmask[r]
     c = 0
 
@@ -222,6 +230,7 @@ def try_augment(r, rowmask, match_row, match_col, n, seen):
             if not seen[c]:
                 seen[c] = True
 
+                # Recurse to see if the column's current match can be reassigned elsewhere.
                 if match_col[c] == -1 or try_augment(
                     match_col[c],
                     rowmask,
@@ -239,8 +248,9 @@ def try_augment(r, rowmask, match_row, match_col, n, seen):
 
     return False
 
-def main():
 
+def main():
+    """Parse the board size from CLI args and launch the interactive game window."""
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--n",

@@ -1,3 +1,8 @@
+# File: transversal_examples.py
+# Description: Figures and worked examples for the transversal tic-tac-toe
+# write-up. Running this module regenerates every image and CSV in
+# ``examples/``.
+
 """Figures and worked examples for the transversal tic-tac-toe write-up.
 
 Running this module regenerates every image and CSV in ``examples/``.
@@ -18,9 +23,7 @@ import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 
 
-# =====================================================================
 # Configuration
-# =====================================================================
 
 OUTDIR = "examples"
 
@@ -42,9 +45,7 @@ PLAYER_STYLE = {
 }
 
 
-# =====================================================================
 # Basic game utilities
-# =====================================================================
 
 def cells_for_player(moves, player):
     """Return the set of cells owned by player."""
@@ -61,6 +62,8 @@ def winning_transversal(moves, player, n):
     """
     cells = cells_for_player(moves, player)
 
+    # Check every possible row-to-column assignment for one that is
+    # fully covered by the player's cells.
     for cols in permutations(range(1, n + 1)):
         transversal = [(r, cols[r - 1]) for r in range(1, n + 1)]
 
@@ -145,9 +148,7 @@ def interleave(x_cells, o_cells):
     return moves
 
 
-# =====================================================================
 # Validation
-# =====================================================================
 
 def validate_history(moves, n, expected_outcome=None):
     """
@@ -180,6 +181,8 @@ def validate_history(moves, n, expected_outcome=None):
 
         occupied.add((r, c))
 
+        # Re-check the outcome after every intermediate ply to make sure
+        # the game did not already end before the history claims it did.
         if ply < len(moves) and outcome(moves[:ply], n) != "ongoing":
             raise ValueError(f"Game ended at ply {ply}, but history continues.")
 
@@ -193,9 +196,7 @@ def validate_history(moves, n, expected_outcome=None):
     return final_outcome
 
 
-# =====================================================================
 # Constructing decisive games
-# =====================================================================
 
 def make_x_win(n):
     """Construct an X win using a non-diagonal transversal."""
@@ -227,9 +228,7 @@ def make_o_win(n):
     return moves
 
 
-# =====================================================================
 # Constructing a draw
-# =====================================================================
 
 def random_draw_attempt(n, rng):
     """Try to construct a draw by randomly filling the board."""
@@ -238,6 +237,8 @@ def random_draw_attempt(n, rng):
     for ply in range(n * n):
         player = "X" if ply % 2 == 0 else "O"
 
+        # Only consider moves that do not immediately hand the mover a
+        # transversal, since the goal here is a full board with no winner.
         safe = [
             cell
             for cell in legal_moves(moves, n)
@@ -273,9 +274,7 @@ def make_draw(n, attempts=DRAW_ATTEMPTS, seed=SEED):
     )
 
 
-# =====================================================================
 # Saving histories
-# =====================================================================
 
 def save_history_csv(moves, path):
     """Save a game history to CSV."""
@@ -292,18 +291,18 @@ def save_history_csv(moves, path):
             writer.writerow([ply, player, move_numbers[player], row, column])
 
 
-# =====================================================================
 # Drawing primitives
 #
 # Every figure in this module draws the same handful of things: a grid,
 # filled cells, stones, boxed cells and bullseye markers.  Cells are
 # addressed by (row, column) with 1-based indices; the matching patch
 # origin is (column - 1, row - 1), with the y axis running downwards.
-# =====================================================================
 
 def setup_board_axes(ax, n, xlim=None, ylim=None):
     """Configure an axis to hold an n x n board with row 1 on top."""
     ax.set_xlim(*(xlim if xlim is not None else (0, n)))
+    # The y-limits are inverted so that row 1 is drawn at the top of the
+    # figure, matching how the board is described elsewhere.
     ax.set_ylim(*(ylim if ylim is not None else (n, 0)))
     ax.set_aspect("equal")
 
@@ -547,9 +546,7 @@ def out(output_dir, filename):
     return os.path.join(output_dir, filename)
 
 
-# =====================================================================
 # Drawing complete game histories
-# =====================================================================
 
 def draw_game_board(
     moves,
@@ -577,6 +574,8 @@ def draw_game_board(
     for row, column in boxed_cells:
         box_cell(ax, row, column, linewidth=box_linewidth)
 
+        # Only stamp the "!" marker for boxed cells that have not been
+        # played yet, since occupied cells already show a stone.
         if mark_empty_boxes and (row, column) not in occupied:
             ax.text(
                 column - 0.5,
@@ -623,9 +622,7 @@ def draw_phase2_board(moves, n, path, threat_cells=None):
     )
 
 
-# =====================================================================
 # Phase 1 open-block invariant figure
-# =====================================================================
 
 def consecutive_blocks(values):
     """Group sorted values into maximal runs of consecutive integers."""
@@ -684,6 +681,8 @@ def draw_phase1_invariant_figure(output_dir=OUTDIR):
 
         setup_board_axes(ax, n)
 
+        # Shade the still-open rectangular blocks so the invariant is
+        # visible as a shaded region rather than just implied by the moves.
         for row_start, row_end in consecutive_blocks(open_rows):
             for col_start, col_end in consecutive_blocks(open_cols):
                 fill_region(
@@ -709,9 +708,7 @@ def draw_phase1_invariant_figure(output_dir=OUTDIR):
         )
 
 
-# =====================================================================
 # Tie-break and Claims A, A' figure
-# =====================================================================
 
 ADMISSIBLE_COLOR = "#b7e4c7"
 ADMISSIBLE_LABEL_COLOR = "#245c38"
@@ -807,6 +804,7 @@ def _draw_tiebreak_panel(path, o_cell, x_cells, admissible, crossed, adjust_righ
             zorder=5,
         )
 
+    # Draw an "x" over each crossed-out corner to show it has been ruled out.
     for row, column in crossed:
         x0, y0 = column - 1, row - 1
 
@@ -1039,9 +1037,7 @@ def draw_tiebreak_claims_figure(output_dir=OUTDIR):
         print(f"Wrote {path}")
 
 
-# =====================================================================
 # Lemma 1 alternating-path figure
-# =====================================================================
 
 def draw_lemma1_figure(output_dir=OUTDIR):
     """
@@ -1064,6 +1060,7 @@ def draw_lemma1_figure(output_dir=OUTDIR):
     switched = (M2 - P_edges_M2) | P_edges_M1
 
     def setup_graph_axis(ax):
+        """Configure the shared bipartite-graph axis layout for this figure."""
         ax.set_xlim(-0.82, 1.72)
         ax.set_ylim(0.55, n + 0.92)
         ax.set_aspect("equal")
@@ -1094,6 +1091,7 @@ def draw_lemma1_figure(output_dir=OUTDIR):
                 )
 
     def draw_edge(ax, edge, color, linewidth=2.4, linestyle="-", zorder=2):
+        """Draw a single edge between a row vertex and a column vertex."""
         r, c = edge
 
         ax.plot(
@@ -1107,6 +1105,7 @@ def draw_lemma1_figure(output_dir=OUTDIR):
         )
 
     def annotate_vertex(ax, x, vertex, text, above):
+        """Label a vertex with a short text callout above or below it."""
         offset = 0.36 if above else -0.36
 
         ax.annotate(
@@ -1119,9 +1118,7 @@ def draw_lemma1_figure(output_dir=OUTDIR):
             fontweight="bold",
         )
 
-    # -----------------------------------------------------------------
     # Panel (a): the two matchings and the alternating path P
-    # -----------------------------------------------------------------
 
     fig, ax = plt.subplots(figsize=(4.7, 3.55))
 
@@ -1163,9 +1160,7 @@ def draw_lemma1_figure(output_dir=OUTDIR):
         fig, out(output_dir, "lemma1_a.png"), dpi=400, pad_inches=0.02, announce=True
     )
 
-    # -----------------------------------------------------------------
     # Panel (b): after switching along P
-    # -----------------------------------------------------------------
 
     fig, ax = plt.subplots(figsize=(3.65, 3.55))
 
@@ -1183,9 +1178,7 @@ def draw_lemma1_figure(output_dir=OUTDIR):
         fig, out(output_dir, "lemma1_b.png"), dpi=400, pad_inches=0.02, announce=True
     )
 
-    # -----------------------------------------------------------------
     # Panel (c): the augmented matching
-    # -----------------------------------------------------------------
 
     fig, ax = plt.subplots(figsize=(3.65, 3.55))
 
@@ -1204,9 +1197,7 @@ def draw_lemma1_figure(output_dir=OUTDIR):
     )
 
 
-# =====================================================================
 # Lemma 3 four-panel figure
-# =====================================================================
 
 def draw_lemma3_figure(output_dir=OUTDIR):
     """Draw a compact four-panel matrix-style illustration of Lemma 3."""
@@ -1217,6 +1208,7 @@ def draw_lemma3_figure(output_dir=OUTDIR):
     r, s = 1, 2
 
     def sigma(x):
+        """Identity permutation used for this concrete example."""
         return x
 
     cases = [
@@ -1297,9 +1289,7 @@ def draw_lemma3_figure(output_dir=OUTDIR):
     )
 
 
-# =====================================================================
 # Phase 2 forcing example
-# =====================================================================
 
 def make_phase2_example():
     """
@@ -1344,9 +1334,7 @@ def generate_phase2_examples(output_dir=OUTDIR):
     print(f"Wrote Phase 2 examples to {output_dir}/")
 
 
-# =====================================================================
 # Claim C case figures
-# =====================================================================
 
 def draw_claim_c_cases_figure(output_dir=OUTDIR):
     """
@@ -1375,6 +1363,7 @@ def draw_claim_c_cases_figure(output_dir=OUTDIR):
     d = 5
 
     def draw_case(o_cells, path, show_axb=False):
+        """Draw one Claim C case board for the given set of O stones."""
         fig, ax = plt.subplots(figsize=(4.35, 4.35))
 
         # Leave a little extra room below/left for labels.
@@ -1501,9 +1490,7 @@ def draw_claim_c_cases_figure(output_dir=OUTDIR):
         draw_case(o_cells, out(output_dir, filename), show_axb=show_axb)
 
 
-# =====================================================================
 # Two-live-rows figures
-# =====================================================================
 
 def draw_two_live_rows_figure(output_dir=OUTDIR):
     """
@@ -1531,6 +1518,7 @@ def draw_two_live_rows_figure(output_dir=OUTDIR):
     r, s = 1, 2
 
     def sigma(t):
+        """Identity permutation used for this concrete example."""
         return t
 
     # Sanity checks for the intended example.
@@ -1648,9 +1636,7 @@ def draw_two_live_rows_figure(output_dir=OUTDIR):
         )
 
 
-# =====================================================================
 # Example registry
-# =====================================================================
 
 def generate_example(name, moves, n, output_dir=OUTDIR):
     """Save one example's board and history."""
@@ -1675,11 +1661,10 @@ def generate_example(name, moves, n, output_dir=OUTDIR):
     }
 
 
-# =====================================================================
 # Main
-# =====================================================================
 
 def main():
+    """Regenerate every example figure and CSV in the output directory."""
     n = 5
 
     os.makedirs(OUTDIR, exist_ok=True)

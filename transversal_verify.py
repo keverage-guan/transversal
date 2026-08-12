@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """
 transversal_verify.py
-=====================
 
-Exhaustive verification of the upper bound  "X wins by ply 2n+3"  for the
+Exhaustive verification of the upper bound "X wins by ply 2n+3" for the
 transversal achievement game on the n x n board.
 
 The script implements the strategy of Section 4 of the accompanying note
@@ -49,12 +48,11 @@ from collections import Counter, defaultdict
 from functools import lru_cache
 from multiprocessing import Pool, cpu_count
 
-# ---------------------------------------------------------------------------
+
 # Bipartite matching engine.
 #
 # A set S of cells is stored as a tuple of n row-masks: bit c of entry r is
 # set iff (r,c) in S.  nu(S) is the maximum size of a matching inside S.
-# ---------------------------------------------------------------------------
 
 
 def max_matching(rowmask, n):
@@ -66,7 +64,7 @@ def max_matching(rowmask, n):
     for r in range(n):
         seen = 0
         stack = [(r, 0)]
-        # iterative DFS for an augmenting path from row r
+        # Iterative DFS for an augmenting path from row r.
         path = []
         if _try_augment(r, rowmask, match_row, match_col, n, [0]):
             size += 1
@@ -96,6 +94,7 @@ def _try_augment(r, rowmask, match_row, match_col, n, _dummy, seen=None):
 
 @lru_cache(maxsize=None)
 def nu(rowmask, n):
+    """Return the maximum matching size of the cell set encoded by rowmask."""
     return max_matching(rowmask, n)[0]
 
 
@@ -112,7 +111,7 @@ def completing_cells(rowmask, n):
     if size <= n - 2:
         return []
     if size == n:
-        return []  # already a transversal; nothing to "complete"
+        return []  # Already a transversal; nothing to "complete".
 
     p0 = next(r for r in range(n) if match_row[r] == -1)
     q0 = next(c for c in range(n) if match_col[c] == -1)
@@ -129,7 +128,7 @@ def completing_cells(rowmask, n):
             if (m & 1) and c not in seen_cols:
                 seen_cols.add(c)
                 r2 = match_col[c]
-                # r2 == -1 would be an augmenting path, impossible at maximum
+                # r2 == -1 would be an augmenting path, impossible at maximum.
                 if r2 != -1 and r2 not in DR:
                     DR.add(r2)
                     frontier.append(r2)
@@ -183,9 +182,7 @@ def completing_cells_bruteforce(rowmask, n):
     return out
 
 
-# ---------------------------------------------------------------------------
 # Game state
-# ---------------------------------------------------------------------------
 
 
 class State:
@@ -194,6 +191,7 @@ class State:
     __slots__ = ("n", "occ", "x_rows", "o_rows", "x_moves", "o_moves", "ctx")
 
     def __init__(self, n):
+        """Set up an empty n x n board with no stones played."""
         self.n = n
         self.occ = {}                     # cell -> 'X' | 'O'
         self.x_rows = [0] * n             # row-masks
@@ -202,11 +200,14 @@ class State:
         self.o_moves = []
         self.ctx = {}                     # strategy context set at the tie-break
 
-    # -- basic ops ---------------------------------------------------------
+    # -- basic ops --
+
     def free(self, cell):
+        """Return True if cell is unoccupied."""
         return cell not in self.occ
 
     def play(self, cell, who):
+        """Place who's stone on cell and record it."""
         r, c = cell
         self.occ[cell] = who
         if who == "X":
@@ -217,6 +218,7 @@ class State:
             self.o_moves.append(cell)
 
     def unplay(self, cell, who):
+        """Undo the most recent play of who's stone on cell."""
         r, c = cell
         del self.occ[cell]
         if who == "X":
@@ -227,16 +229,20 @@ class State:
             self.o_moves.pop()
 
     def free_cells(self):
+        """Return the list of all currently unoccupied cells."""
         n = self.n
         return [
             (r, c) for r in range(n) for c in range(n) if (r, c) not in self.occ
         ]
 
-    # -- derived -----------------------------------------------------------
+    # -- derived --
+
     def x_mask(self):
+        """Return X's stones as a tuple of row-masks."""
         return tuple(self.x_rows)
 
     def o_mask(self):
+        """Return O's stones as a tuple of row-masks."""
         return tuple(self.o_rows)
 
     def open_block(self):
@@ -252,10 +258,12 @@ class State:
         return UR, UC
 
     def free_completions(self, who):
+        """Return who's free cells that would complete a transversal."""
         mask = self.x_mask() if who == "X" else self.o_mask()
         return [f for f in completing_cells(mask, self.n) if f not in self.occ]
 
     def has_transversal(self, who):
+        """Return True if who currently holds a complete transversal."""
         mask = self.x_mask() if who == "X" else self.o_mask()
         return nu(mask, self.n) == self.n
 
@@ -264,9 +272,7 @@ class VerificationError(AssertionError):
     """Raised when a claim of the proof fails at some node."""
 
 
-# ---------------------------------------------------------------------------
 # X's strategy (Section 4)
-# ---------------------------------------------------------------------------
 
 
 def phase1_candidates(st):
@@ -311,7 +317,7 @@ def tiebreak_candidates(st):
             b = u2 if a == 0 else u1
             d = v2 if c_ == 0 else v1
             if not st.free(cell) or not st.free((b, d)):
-                continue  # inadmissible
+                continue  # Inadmissible.
             w = sum(1 for (orow, ocol) in F if orow == b or ocol == d)
             outcomes.append((cell, b, d, w))
     if not outcomes:
@@ -328,6 +334,7 @@ def tiebreak_candidates(st):
 def build_context(st, b, d, tiebreak_cell):
     """Compute sigma, F, w, live rows, plan and the admissible (r,s) pairs."""
     n = st.n
+
     # sigma from X's (n-1)-matching
     sigma = {}
     for (r, c) in st.x_moves:
@@ -368,7 +375,7 @@ def build_context(st, b, d, tiebreak_cell):
                      if r != s and st.free((r, sigma[s]))]
         else:
             plan, case = "i", "C-iii(nu=n-2)"
-            # rule 4.3: s := u_a, r any live row != u_a
+            # Rule 4.3: s := u_a, r any live row != u_a.
             if ua not in live:
                 raise VerificationError("u_a is not live (contradicts Claim B')")
             pairs = [(r, ua) for r in live
@@ -391,11 +398,11 @@ def planned_move(ctx, which):
         return (r, d) if which == 1 else (b, sigma[s])
 
 
-# ---------------------------------------------------------------------------
 # Exhaustive search over O's defences
-# ---------------------------------------------------------------------------
+
 
 def verify_worker(args):
+    """Run the verifier for one fixed first O-reply; used as a Pool.map target."""
     n, first_o_move, all_x_choices = args
 
     v = Verifier(
@@ -414,8 +421,11 @@ def verify_worker(args):
 
 
 class Verifier:
+    """Drives the exhaustive game-tree search and accumulates statistics."""
+
     def __init__(self, n, all_x_choices=False, collect_examples=True,
                  progress_every=0):
+        """Configure the verifier for board size n and reset its counters."""
         self.n = n
         self.all_x = all_x_choices
         self.collect = collect_examples
@@ -423,6 +433,7 @@ class Verifier:
         self.reset()
 
     def reset(self):
+        """Clear all accumulated statistics and restart the timer."""
         n = self.n
         self.leaves = 0
         self.nodes = 0
@@ -438,8 +449,10 @@ class Verifier:
         self.max_win_ply = 0
         self.t0 = time.time()
 
-    # -- recording ---------------------------------------------------------
+    # -- recording --
+
     def record_leaf(self, st, ply, tag, deviated_at):
+        """Record statistics for a terminal (X-wins) line of play."""
         self.leaves += 1
         self.win_ply[ply] += 1
         self.max_win_ply = max(self.max_win_ply, ply)
@@ -460,6 +473,7 @@ class Verifier:
             print(f"    ... {self.leaves:,} lines  ({el:.1f}s)", file=sys.stderr)
 
     def snapshot(self, st, ply):
+        """Capture a human-readable record of the current line, for examples."""
         n = self.n
         moves = []
         for i in range(max(len(st.x_moves), len(st.o_moves))):
@@ -475,8 +489,10 @@ class Verifier:
             moves=[(who, [c[0] + 1, c[1] + 1]) for who, c in moves],
         )
 
-    # -- the search --------------------------------------------------------
+    # -- the search --
+
     def run(self):
+        """Run the full search from the empty board and return the report."""
         st = State(self.n)
         self.x_node(st, 1, None)
         return self.report()
@@ -515,7 +531,7 @@ class Verifier:
 
         k = len(st.x_moves) + 1  # index of the X-move about to be made
 
-        # --- Phase 1, moves 1..n-2 ---------------------------------------
+        # Phase 1, moves 1..n-2.
         if k <= n - 2:
             cands = phase1_candidates(st)
             if not self.all_x:
@@ -527,7 +543,7 @@ class Verifier:
                 st.unplay(cell, "X")
             return
 
-        # --- Move n-1: the tie-break of Sec. 5 ---------------------------
+        # Move n-1: the tie-break of Sec. 5.
         if k == n - 1:
             outs = tiebreak_candidates(st)
             if not self.all_x:
@@ -543,7 +559,7 @@ class Verifier:
                 saved = st.ctx
                 for (r, s) in pairs:
                     st.ctx = dict(ctx, r=r, s=s)
-                    # (S): exactly one free completing cell -- a single threat
+                    # (S): exactly one free completing cell -- a single threat.
                     thr = st.free_completions("X")
                     if thr != [(b, d)]:
                         raise VerificationError(
@@ -553,9 +569,9 @@ class Verifier:
                 st.unplay(cell, "X")
             return
 
-        # --- Phase 2: the two planned moves ------------------------------
+        # Phase 2: the two planned moves.
         which = 1 if k == n else 2
-        # (Ca) O must have no threat when X is about to move
+        # (Ca) O must have no threat when X is about to move.
         othr = st.free_completions("O")
         if othr:
             raise VerificationError(
@@ -605,6 +621,7 @@ class Verifier:
             st.unplay(cell, "O")
 
     def check_invariant_I(self, st):
+        """Verify that no O-stone lies inside the current open block H."""
         UR, UC = st.open_block()
         URs, UCs = set(UR), set(UC)
         for (r, c) in st.o_moves:
@@ -612,8 +629,10 @@ class Verifier:
                 raise VerificationError(
                     f"invariant (I) fails: O-stone {(r,c)} lies in the open block")
 
-    # -- output ------------------------------------------------------------
+    # -- output --
+
     def report(self):
+        """Assemble the accumulated statistics into a serializable dict."""
         n = self.n
         return dict(
             n=n,
@@ -639,9 +658,7 @@ class Verifier:
         )
 
 
-# ---------------------------------------------------------------------------
 # Principal variation (O blocks every time)
-# ---------------------------------------------------------------------------
 
 
 def principal_variation(n):
@@ -675,7 +692,7 @@ def principal_variation(n):
             st.play(cell, "X")
             log.append(("X", cell, ply))
             ply += 1
-        # O blocks if threatened, else plays lexicographically first free cell
+        # O blocks if threatened, else plays lexicographically first free cell.
         thr = st.free_completions("X")
         ocell = thr[0] if thr else st.free_cells()[0]
         st.play(ocell, "O")
@@ -683,12 +700,11 @@ def principal_variation(n):
         ply += 1
 
 
-# ---------------------------------------------------------------------------
 # Self-test of the structural lemmas
-# ---------------------------------------------------------------------------
 
 
 def selftest(seed=12345, trials=4000):
+    """Cross-check Lemma 1 and Corollary 2 against brute-force reference code."""
     import random
     rng = random.Random(seed)
     print("Self-test: Lemma 1 (completing cells = D_R x D_C) against brute force")
@@ -704,7 +720,7 @@ def selftest(seed=12345, trials=4000):
         rm = tuple(rm)
         fast = sorted(completing_cells(rm, n))
         slow = sorted(completing_cells_bruteforce(rm, n))
-        # brute force only reports cells not already in S; Lemma 1's remark
+        # Brute force only reports cells not already in S; Lemma 1's remark
         # says the rectangle is automatically disjoint from S, so they agree.
         if fast != slow:
             bad += 1
@@ -727,11 +743,11 @@ def selftest(seed=12345, trials=4000):
     return bad == 0 and bad2 == 0
 
 
-# ---------------------------------------------------------------------------
 # CLI
-# ---------------------------------------------------------------------------
+
 
 def merge_reports(reports):
+    """Combine the per-first-O-move reports produced by the worker pool."""
     out = reports[0].copy()
 
     out["terminal_lines"] = sum(
@@ -773,6 +789,7 @@ def merge_reports(reports):
 
 
 def main(argv=None):
+    """Parse CLI arguments and run the verification (or self-test)."""
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--n", type=int, default=4, help="board size (default 4)")

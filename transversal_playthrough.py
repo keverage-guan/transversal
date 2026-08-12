@@ -1,3 +1,13 @@
+"""
+transversal_playthrough.py
+
+Generates a rendered playthrough of a prescribed 6x6 transversal
+(Latin-square style) game between X and O. Validates that the given
+move sequence is legal and ends with X winning, then draws one
+annotated board image per ply showing the open block H, threat
+cells, and the final winning transversal.
+"""
+
 from __future__ import annotations
 
 import os
@@ -9,10 +19,6 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 
-
-# =====================================================================
-# Configuration
-# =====================================================================
 
 OUTDIR = "playthrough_6x6"
 N = 6
@@ -33,11 +39,8 @@ LIVE2_EDGE = "#9a5f13"
 FORCED_COLOR = "#555555"
 
 
-# =====================================================================
-# Game utilities
-# =====================================================================
-
 def cells_for_player(moves, player):
+    """Return the set of (row, col) cells occupied by the given player."""
     return {
         (r, c)
         for who, r, c in moves
@@ -46,8 +49,11 @@ def cells_for_player(moves, player):
 
 
 def has_transversal(moves, player, n):
+    """Return True if the player's cells contain a full transversal."""
     cells = cells_for_player(moves, player)
 
+    # A transversal is a permutation of columns, one per row; check
+    # every permutation until one is fully covered by the player's cells.
     for cols in permutations(range(1, n + 1)):
         if all(
             (r, cols[r - 1]) in cells
@@ -59,6 +65,7 @@ def has_transversal(moves, player, n):
 
 
 def winning_transversal(moves, player, n):
+    """Return the list of cells forming the player's transversal, or None."""
     cells = cells_for_player(moves, player)
 
     for cols in permutations(range(1, n + 1)):
@@ -74,10 +81,13 @@ def winning_transversal(moves, player, n):
 
 
 def outcome(moves, n):
+    """Return 'X', 'O', 'draw', or 'ongoing' for the given position."""
     x_wins = has_transversal(moves, "X", n)
     o_wins = has_transversal(moves, "O", n)
 
     if x_wins and o_wins:
+        # This should never happen in a legal game since play stops
+        # as soon as one player completes a transversal.
         raise ValueError(
             "Invalid position: both players have transversals."
         )
@@ -95,6 +105,7 @@ def outcome(moves, n):
 
 
 def validate_history(moves, n):
+    """Validate a full move history and confirm it ends with an X win."""
     occupied = set()
 
     for ply, (player, row, column) in enumerate(
@@ -129,6 +140,9 @@ def validate_history(moves, n):
         occupied.add((row, column))
 
         if ply < len(moves):
+            # Confirm the game hasn't already ended before this ply,
+            # since a prescribed history must not include moves after
+            # a win.
             result = outcome(moves[:ply], n)
 
             if result != "ongoing":
@@ -142,10 +156,6 @@ def validate_history(moves, n):
             "The prescribed playthrough does not end with X winning."
         )
 
-
-# =====================================================================
-# Open block H
-# =====================================================================
 
 def get_H(ply):
     """
@@ -177,10 +187,6 @@ def get_H(ply):
     return open_rows, open_cols
 
 
-# =====================================================================
-# Special annotations
-# =====================================================================
-
 def annotations_for_ply(ply):
     """
     Return cells that should be specially highlighted.
@@ -196,14 +202,11 @@ def annotations_for_ply(ply):
             (r,sigma(s))    = (1,3)
     """
 
-    # -------------------------------------------------------------
     # O_4 enters H.
     #
     # H = {5,6} x {5,6}.
     #
     # The two admissible cells are (5,6) and (6,5).
-    # -------------------------------------------------------------
-
     if ply == 8:
         return {
             "admissible": {
@@ -215,12 +218,9 @@ def annotations_for_ply(ply):
             "forced": set(),
         }
 
-    # -------------------------------------------------------------
     # X_5 chooses (5,6).
     #
     # Highlight the remaining admissible square.
-    # -------------------------------------------------------------
-
     if ply == 9:
         return {
             "admissible": {
@@ -231,7 +231,6 @@ def annotations_for_ply(ply):
             "forced": {(6, 5)},
         }
 
-    # -------------------------------------------------------------
     # O_5 blocks (6,5).
     #
     # The two live rows are:
@@ -243,8 +242,6 @@ def annotations_for_ply(ply):
     #       (2,5) and (6,3)
     #
     # We use Plan (i).
-    # -------------------------------------------------------------
-
     if ply == 10:
         return {
             "admissible": set(),
@@ -259,12 +256,9 @@ def annotations_for_ply(ply):
             "forced": set(),
         }
 
-    # -------------------------------------------------------------
     # X_6 plays (6,1) = (b, sigma(r)).
     #
     # This creates the unique threat (1,5) = (r,d).
-    # -------------------------------------------------------------
-
     if ply == 11:
         return {
             "admissible": set(),
@@ -275,14 +269,11 @@ def annotations_for_ply(ply):
             "forced": {(1, 5)},
         }
 
-    # -------------------------------------------------------------
     # O_6 blocks (1,5).
     #
     # The second live row remains:
     #
     #     (2,5) and (6,3)
-    # -------------------------------------------------------------
-
     if ply == 12:
         return {
             "admissible": set(),
@@ -294,15 +285,12 @@ def annotations_for_ply(ply):
             "forced": set(),
         }
 
-    # -------------------------------------------------------------
     # X_7 plays (2,5) = (s,d).
     #
     # This creates the double threat:
     #
     #     (6,3) = (b, sigma(s))
     #     (1,3) = (r, sigma(s))
-    # -------------------------------------------------------------
-
     if ply == 13:
         return {
             "admissible": set(),
@@ -314,12 +302,9 @@ def annotations_for_ply(ply):
             },
         }
 
-    # -------------------------------------------------------------
     # O_7 blocks (6,3).
     #
     # The remaining threat is (1,3).
-    # -------------------------------------------------------------
-
     if ply == 14:
         return {
             "admissible": set(),
@@ -328,10 +313,7 @@ def annotations_for_ply(ply):
             "forced": {(1, 3)},
         }
 
-    # -------------------------------------------------------------
     # X_8 plays (1,3) and wins.
-    # -------------------------------------------------------------
-
     if ply == 15:
         return {
             "admissible": set(),
@@ -340,10 +322,7 @@ def annotations_for_ply(ply):
             "forced": set(),
         }
 
-    # -------------------------------------------------------------
-    # Default.
-    # -------------------------------------------------------------
-
+    # Default: no ply-specific annotations.
     return {
         "admissible": set(),
         "live_1": set(),
@@ -351,10 +330,6 @@ def annotations_for_ply(ply):
         "forced": set(),
     }
 
-
-# =====================================================================
-# Drawing helpers
-# =====================================================================
 
 def draw_H(ax, open_rows, open_cols):
     """
@@ -365,10 +340,7 @@ def draw_H(ax, open_rows, open_cols):
     if not open_rows or not open_cols:
         return
 
-    # -------------------------------------------------------------
     # Shade each actual cell of H.
-    # -------------------------------------------------------------
-
     for row in open_rows:
         for col in open_cols:
             ax.add_patch(
@@ -383,11 +355,8 @@ def draw_H(ax, open_rows, open_cols):
                 )
             )
 
-    # -------------------------------------------------------------
-    # Find consecutive runs of rows and columns.
-    # -------------------------------------------------------------
-
     def consecutive_runs(values):
+        """Return (start, end) ranges of consecutive integers in values."""
         values = sorted(values)
 
         if not values:
@@ -410,13 +379,12 @@ def draw_H(ax, open_rows, open_cols):
 
         return runs
 
+    # Find consecutive runs of rows and columns so that H's rectangular
+    # components can be outlined individually rather than as one box.
     row_runs = consecutive_runs(open_rows)
     col_runs = consecutive_runs(open_cols)
 
-    # -------------------------------------------------------------
-    # Draw dotted boundary around every component.
-    # -------------------------------------------------------------
-
+    # Draw a dotted boundary around every component.
     for r_min, r_max in row_runs:
         for c_min, c_max in col_runs:
 
@@ -445,6 +413,7 @@ def highlight_cell(
     edgecolor,
     linewidth=2.4,
 ):
+    """Draw a filled, outlined rectangle over a single board cell."""
     ax.add_patch(
         mpatches.Rectangle(
             (col - 1, row - 1),
@@ -554,11 +523,8 @@ def draw_transversal(ax, transversal):
         )
 
 
-# =====================================================================
-# Draw one frame
-# =====================================================================
-
 def draw_board(moves, ply, path):
+    """Render a single board frame for the given ply and save it to path."""
 
     fig, ax = plt.subplots(
         figsize=(5.0, 5.0),
@@ -576,10 +542,6 @@ def draw_board(moves, ply, path):
 
     ax.set_aspect("equal")
 
-    # -------------------------------------------------------------
-    # H
-    # -------------------------------------------------------------
-
     open_rows, open_cols = get_H(ply)
 
     draw_H(
@@ -587,10 +549,6 @@ def draw_board(moves, ply, path):
         open_rows,
         open_cols,
     )
-
-    # -------------------------------------------------------------
-    # Special cells
-    # -------------------------------------------------------------
 
     annotations = annotations_for_ply(ply)
 
@@ -624,10 +582,6 @@ def draw_board(moves, ply, path):
             linewidth=2.5,
         )
 
-    # -------------------------------------------------------------
-    # Grid
-    # -------------------------------------------------------------
-
     for i in range(N + 1):
 
         ax.plot(
@@ -645,10 +599,6 @@ def draw_board(moves, ply, path):
             linewidth=1.0,
             zorder=3,
         )
-
-    # -------------------------------------------------------------
-    # Stones
-    # -------------------------------------------------------------
 
     move_numbers = {
         "X": 0,
@@ -696,10 +646,8 @@ def draw_board(moves, ply, path):
             zorder=6,
         )
 
-    # -------------------------------------------------------------
-    # Target marks for forced cells
-    # -------------------------------------------------------------
-
+    # Draw target marks for forced cells, but only where the cell
+    # is still empty (an occupied cell no longer needs a target).
     for row, col in annotations["forced"]:
 
         if (row, col) not in occupied:
@@ -709,12 +657,8 @@ def draw_board(moves, ply, path):
                 col,
             )
 
-    # -------------------------------------------------------------
-    # Final winning transversal
-    # -------------------------------------------------------------
-
     if ply == len(FULL_GAME):
-
+        # On the final frame, outline the actual winning transversal.
         transversal = winning_transversal(
             moves,
             "X",
@@ -730,10 +674,6 @@ def draw_board(moves, ply, path):
             ax,
             transversal,
         )
-
-    # -------------------------------------------------------------
-    # Clean axes
-    # -------------------------------------------------------------
 
     ax.set_xticks([])
     ax.set_yticks([])
@@ -758,26 +698,18 @@ def draw_board(moves, ply, path):
     plt.close(fig)
 
 
-# =====================================================================
-# 6x6 playthrough
-# =====================================================================
-
+# Phase 1
+#
+# X stones:
+#
+#   X_1 = (1,1)
+#   X_2 = (2,3)
+#   X_3 = (3,2)
+#   X_4 = (4,4)
+#
+# The first four rows and columns are exhausted, so
+# H becomes the contiguous 2x2 block {5,6} x {5,6}.
 FULL_GAME = [
-
-    # -------------------------------------------------------------
-    # Phase 1
-    #
-    # X stones:
-    #
-    #   X_1 = (1,1)
-    #   X_2 = (2,3)
-    #   X_3 = (3,2)
-    #   X_4 = (4,4)
-    #
-    # The first four rows and columns are exhausted, so
-    # H becomes the contiguous 2x2 block {5,6} x {5,6}.
-    # -------------------------------------------------------------
-
     ("X", 1, 1),       # X_1
     ("O", 1, 2),       # O_1
 
@@ -790,15 +722,11 @@ FULL_GAME = [
     ("X", 4, 4),       # X_4
     ("O", 5, 5),       # O_4: enters H
 
-    # -------------------------------------------------------------
     # Tie-break
-    # -------------------------------------------------------------
-
     ("X", 5, 6),       # X_5
 
     ("O", 6, 5),       # O_5
 
-    # -------------------------------------------------------------
     # Phase 2 -- Plan (i)
     #
     # Here F meets column d=5, so the strategy uses Plan (i).
@@ -812,8 +740,6 @@ FULL_GAME = [
     # X_7 creates the double threat:
     #   (b,sigma(s)) = (6,3)
     #   (r,sigma(s)) = (1,3)
-    # -------------------------------------------------------------
-
     ("X", 6, 1),       # X_6
     ("O", 1, 5),       # O_6: forced block
 
@@ -824,11 +750,8 @@ FULL_GAME = [
 ]
 
 
-# =====================================================================
-# Main
-# =====================================================================
-
 def main():
+    """Validate the prescribed playthrough and render one frame per ply."""
 
     os.makedirs(
         OUTDIR,
