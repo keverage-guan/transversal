@@ -2,7 +2,7 @@ import project.Convert
 import project.Game
 
 /-!
-# The small cases `n = 1` and `n = 2` (§1 of `aristotle.tex`)
+# The small cases `n = 1` and `n = 2` (§1 of `main.tex`)
 
 "For `n = 1` the first player wins with their first stone. For `n = 2` the two winning sets are
 the diagonals `A = {(1,1),(2,2)}` and `B = {(1,2),(2,1)}`. O can draw with the strategy of
@@ -19,7 +19,7 @@ namespace Transversal
 
 open Finset
 
-/-- **Theorem A** of `aristotle.tex`, case `n = 1`: the first player wins with their first
+/-- **Theorem A** of `main.tex`, case `n = 1`: the first player wins with their first
 stone. -/
 theorem win_one : XCanWin 1 (⟨∅, ∅⟩ : Position 1) := by
   refine xCanWin_one (c := (0, 0)) (by simp [Position.occupied]) ?_
@@ -31,7 +31,7 @@ theorem win_one : XCanWin 1 (⟨∅, ∅⟩ : Position 1) := by
   simp
 
 /-- On the `2 × 2` board the two transversals are the two diagonals `A = {(1,1),(2,2)}` and
-`B = {(1,2),(2,1)}` of §1 of `aristotle.tex`. -/
+`B = {(1,2),(2,1)}` of §1 of `main.tex`. -/
 theorem hasTransversal_two_iff {S : Finset (Cell 2)} :
     HasTransversal S ↔
       ((((0 : Fin 2), (0 : Fin 2)) ∈ S ∧ ((1 : Fin 2), (1 : Fin 2)) ∈ S) ∨
@@ -119,7 +119,7 @@ theorem not_oCanWin_step {p : Position 2} (hO : ¬ HasTransversal p.O)
       · exact (h c' hc').1 hwin
       · exact (h c' hc').2 k hrec
 
-/-- **Theorem A** of `aristotle.tex`, case `n = 2`, first half: Player 1 cannot force a win on
+/-- **Theorem A** of `main.tex`, case `n = 2`, first half: Player 1 cannot force a win on
 the `2 × 2` board. O answers X's first stone with its partner in the same diagonal; the
 remaining two cells are the other diagonal, which the players take one each, so X never owns a
 diagonal. -/
@@ -189,7 +189,7 @@ theorem no_win_two_X : ∀ k, ¬ XCanWin k (⟨∅, ∅⟩ : Position 2) := by
         not_xCanWin_of_full (by decide) (by simp [hasTransversal_two_iff])⟩
     · exact absurd hc (by simp [Position.occupied, Position.playX, Position.playO])
 
-/-- **Theorem A** of `aristotle.tex`, case `n = 2`, second half: Player 2 cannot force a win on
+/-- **Theorem A** of `main.tex`, case `n = 2`, second half: Player 2 cannot force a win on
 the `2 × 2` board either (in the paper this is the strategy-stealing remark). Hence `n = 2` is a
 draw. -/
 theorem no_win_two_O : ∀ k, ¬ OCanWin k (⟨∅, ∅⟩ : Position 2) := by

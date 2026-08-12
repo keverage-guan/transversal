@@ -1,7 +1,7 @@
 import project.Rectangle
 
 /-!
-# Phase 1 and the tie-break (§3 and Lemmas 4.1–4.3 of `aristotle.tex`)
+# Phase 1 and the tie-break (§3 and Lemmas 4.1–4.3 of `main.tex`)
 
 This file formalises:
 
@@ -21,12 +21,12 @@ open scoped Classical
 
 variable {n : ℕ}
 
-/-- The **open block** `H = U_R × U_C` of §3 of `aristotle.tex`, where `U_R` and `U_C` are the
+/-- The **open block** `H = U_R × U_C` of §3 of `main.tex`, where `U_R` and `U_C` are the
 rows and the columns containing no X-stone. -/
 def openBlock (UR UC : Finset (Fin n)) : Finset (Cell n) := UR ×ˢ UC
 
 /-- The other element of a two-element set `{x, y}`; used for the "opposite corner" of the
-open block `H = {u₁,u₂} × {v₁,v₂}` at X's move `n - 1` (§3 of `aristotle.tex`). -/
+open block `H = {u₁,u₂} × {v₁,v₂}` at X's move `n - 1` (§3 of `main.tex`). -/
 def other (x y a : Fin n) : Fin n := if a = x then y else x
 
 theorem other_left {x y : Fin n} : other x y x = y := by simp [other]
@@ -34,11 +34,11 @@ theorem other_left {x y : Fin n} : other x y x = y := by simp [other]
 theorem other_right {x y : Fin n} (h : y ≠ x) : other x y y = x := by simp [other, h]
 
 /-- The parameter `w = |F ∩ (row b ∪ col d)|` attached to a candidate outcome `(b, d)` of the
-tie-break of §3 of `aristotle.tex`, where `F` is the set of O-stones. -/
+tie-break of §3 of `main.tex`, where `F` is the set of O-stones. -/
 noncomputable def wParam (F : Finset (Cell n)) (b d : Fin n) : ℕ :=
   (F.filter (fun z => z.1 = b ∨ z.2 = d)).card
 
-/-- **Lemma 4.1** (feasibility of Phase 1) of `aristotle.tex`. Before X's Phase-1 move the open
+/-- **Lemma 4.1** (feasibility of Phase 1) of `main.tex`. Before X's Phase-1 move the open
 block is `H = U_R × U_C` and, by Invariant 3.1, the only O-stone that can lie in `H` is O's most
 recent stone `x`. Then X can play a free cell `c` of `H` such that the new open block
 `(U_R \ {c.1}) × (U_C \ {c.2})` again contains no O-stone, i.e. Invariant 3.1 is restored.
@@ -113,7 +113,7 @@ theorem wParam_add_wParam_le {F : Finset (Cell n)} {b d b' d' : Fin n} :
   rw [wParam, wParam]
   omega
 
-/-- **Lemma 4.2** (good tie-break) of `aristotle.tex`: with `H = {u₁,u₂} × {v₁,v₂}` the open
+/-- **Lemma 4.2** (good tie-break) of `main.tex`: with `H = {u₁,u₂} × {v₁,v₂}` the open
 block before X's move `n - 1`, `F` the `n - 2` O-stones, of which at most one lies in `H`
 (Invariant 3.1 together with Lemma 4.1), some admissible outcome `(b, d)` — i.e. one for which
 both `(b,d)` and the cell `(other u₁ u₂ b, other v₁ v₂ d)` played by X are free — satisfies
@@ -231,7 +231,7 @@ theorem isMatching_of_nu_eq_card {F : Finset (Cell n)} (h : nu F = F.card) : IsM
   have : M = F := Finset.eq_of_subset_of_card_le hMF (by omega)
   exact this ▸ hM
 
-/-- First part of **Lemma 4.3** (structure of `F` when `w = 0`) of `aristotle.tex`: if the
+/-- First part of **Lemma 4.3** (structure of `F` when `w = 0`) of `main.tex`: if the
 outcome `(b,d)` chosen by the tie-break is admissible and has `w = 0`, then no O-stone lies in
 the open block `H = {u₁,u₂} × {v₁,v₂}` (in particular O's latest stone `x_{n-2}` is not in
 `H`, so all four corners of `H` are admissible). -/
@@ -254,7 +254,7 @@ theorem structF_no_stone_in_block {u₁ u₂ v₁ v₂ b d : Fin n} {F : Finset 
   have hzeq : z = (other u₁ u₂ b, other v₁ v₂ d) := Prod.ext h1 h2
   exact hoppfree (hzeq ▸ hzF)
 
-/-- Second part of **Lemma 4.3** of `aristotle.tex`: if moreover `ν(F) = n - 2`, then `F` is a
+/-- Second part of **Lemma 4.3** of `main.tex`: if moreover `ν(F) = n - 2`, then `F` is a
 perfect matching of `A × B`, where `A = R \ {u₁,u₂}` and `B = C \ {v₁,v₂}`. The hypothesis
 `htie` is the tie-break rule of §3: no admissible outcome has `1 ≤ w ≤ n - 3`. -/
 theorem structF_perfect_matching {u₁ u₂ v₁ v₂ b d : Fin n} {F : Finset (Cell n)}

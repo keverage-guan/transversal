@@ -1,7 +1,7 @@
 import project.Game
 
 /-!
-# Player 2 never wins (§1 of `aristotle.tex`)
+# Player 2 never wins (§1 of `main.tex`)
 
 > **Player 2 never wins (any `n`).** The winning family is monotone, as a superset of a
 > transversal contains a transversal, and the board is finite, so a strategy-stealing argument
@@ -31,7 +31,7 @@ open scoped Classical
 variable {n : ℕ}
 
 /-- The winning family is monotone: a superset of a set containing a transversal contains a
-transversal (§1 of `aristotle.tex`). -/
+transversal (§1 of `main.tex`). -/
 theorem hasTransversal_mono {S T : Finset (Cell n)} (hST : S ⊆ T) (h : HasTransversal S) :
     HasTransversal T := by
   have h1 := nu_mono hST
@@ -73,7 +73,7 @@ theorem hasTransversal_of_oCanWin_of_free : ∀ (l : ℕ) (q : Position n) (A : 
     · exact Or.inl (Finset.mem_insert_of_mem h)
     · exact Or.inr (Finset.mem_insert_of_mem h)
 
-/-- **Strategy stealing** (§1 of `aristotle.tex`), the inductive step. `p` is the real position
+/-- **Strategy stealing** (§1 of `main.tex`), the inductive step. `p` is the real position
 with X to move, `q` the imagined position with the imagined first player (the real O) to move,
 `c` is the real O-stone just played, `p.O = insert c q.X` says that the real O-stones are the
 imagined first player's stones, and `q.O ⊆ p.X` says that X's simulated stones are among X's
@@ -177,7 +177,7 @@ theorem steal_aux : ∀ (l : ℕ) (p q : Position n) (c : Cell n),
             (by rw [Position.playO_O, Position.playX_O, Position.playO_X, hqX]) hsub'
     · exact xCanWin_of_hasTransversal hwin
 
-/-- **Strategy stealing** (§1 of `aristotle.tex`): if Player 2 could force a win on the `n × n`
+/-- **Strategy stealing** (§1 of `main.tex`): if Player 2 could force a win on the `n × n`
 board with `n ≥ 2`, then Player 1 could too, by adopting Player 2's strategy after an arbitrary
 first move. -/
 theorem xCanWin_of_oCanWin (hn : 2 ≤ n) {l : ℕ} (h : OCanWin l (⟨∅, ∅⟩ : Position n)) :
@@ -198,7 +198,7 @@ theorem xCanWin_of_oCanWin (hn : 2 ≤ n) {l : ℕ} (h : OCanWin l (⟨∅, ∅�
   · refine steal_aux l _ (⟨∅, ∅⟩ : Position n) c h (by simp [Position.occupied]) rfl ?_
     simp
 
-/-- **Player 2 never wins** (§1 of `aristotle.tex`): for every `n ≥ 2` Player 2 has no strategy
+/-- **Player 2 never wins** (§1 of `main.tex`): for every `n ≥ 2` Player 2 has no strategy
 forcing a win, so the value of the game is "X win" or "draw". -/
 theorem player_two_never_wins (hn : 2 ≤ n) (l : ℕ) : ¬ OCanWin l (⟨∅, ∅⟩ : Position n) := by
   intro h

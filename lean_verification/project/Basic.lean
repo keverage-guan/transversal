@@ -4,7 +4,7 @@ import Mathlib
 # The transversal achievement game: basic notions
 
 This file formalises the basic vocabulary of §1 ("Preliminaries and Main Result") of
-`aristotle.tex`, *The transversal achievement game on a square grid*:
+`main.tex`, *The transversal achievement game on a square grid*:
 
 * the board of an `n × n` grid, identified with the edge set of `K_{n,n}` (a cell `(r,c)`
   is the edge joining row `r` to column `c`);
@@ -27,40 +27,40 @@ open scoped Classical
 variable {n : ℕ}
 
 /-- A **cell** of the `n × n` board, i.e. a pair `(r, c)` consisting of a row and a column.
-Following §1 of `aristotle.tex` ("The board as `K_{n,n}`") a cell is identified with the edge
+Following §1 ("The board as `K_{n,n}`") a cell is identified with the edge
 of the complete bipartite graph `K_{n,n}` joining the row vertex `r` to the column vertex `c`. -/
 abbrev Cell (n : ℕ) : Type := Fin n × Fin n
 
 /-- A set of cells is a **matching** when no two of its cells share a row or a column
-(§1 of `aristotle.tex`, "Matchings, threats, and completing cells"; equivalently, a graph
+(§1 of `main.tex`, "Matchings, threats, and completing cells"; equivalently, a graph
 matching of `K_{n,n}`). -/
 def IsMatching (M : Finset (Cell n)) : Prop :=
   ∀ p ∈ M, ∀ q ∈ M, (p.1 = q.1 ∨ p.2 = q.2) → p = q
 
 /-- `ν(S)`, the maximum size of a matching contained in the set of cells `S`
-(§1 of `aristotle.tex`, "Matchings, threats, and completing cells"). -/
+(§1 of `main.tex`, "Matchings, threats, and completing cells"). -/
 noncomputable def nu (S : Finset (Cell n)) : ℕ :=
   ((S.powerset).filter (fun M => IsMatching M)).sup Finset.card
 
 /-- A set of cells **contains a transversal** when `ν(S) = n`, i.e. it contains `n` cells no two
-of which share a row or a column (§1 of `aristotle.tex`). -/
+of which share a row or a column (§1 of `main.tex`). -/
 def HasTransversal (S : Finset (Cell n)) : Prop := nu S = n
 
 /-- The cell `f` **completes** `S` when `ν(S ∪ {f}) = n`
-(§1 of `aristotle.tex`, "Matchings, threats, and completing cells"). -/
+(§1 of `main.tex`, "Matchings, threats, and completing cells"). -/
 def Completes (f : Cell n) (S : Finset (Cell n)) : Prop := nu (insert f S) = n
 
 /-- A player owning `S` **threatens** the cell `f` when `f` is unoccupied (`occ` is the set of
-all occupied cells) and `f` completes `S` (§1 of `aristotle.tex`). -/
+all occupied cells) and `f` completes `S` (§1 of `main.tex`). -/
 def Threatens (occ S : Finset (Cell n)) (f : Cell n) : Prop := f ∉ occ ∧ Completes f S
 
 /-- `D_R`, the set of rows exposed by some maximum matching of `S`
-(Lemma 2.1 of `aristotle.tex`, "threat structure"). -/
+(Lemma 2.1 of `main.tex`, "threat structure"). -/
 def ExposedRows (S : Finset (Cell n)) : Set (Fin n) :=
   {r | ∃ M, M ⊆ S ∧ IsMatching M ∧ M.card = nu S ∧ ∀ p ∈ M, p.1 ≠ r}
 
 /-- `D_C`, the set of columns exposed by some maximum matching of `S`
-(Lemma 2.1 of `aristotle.tex`, "threat structure"). -/
+(Lemma 2.1 of `main.tex`, "threat structure"). -/
 def ExposedCols (S : Finset (Cell n)) : Set (Fin n) :=
   {c | ∃ M, M ⊆ S ∧ IsMatching M ∧ M.card = nu S ∧ ∀ p ∈ M, p.2 ≠ c}
 
@@ -117,7 +117,7 @@ theorem nu_le (S : Finset (Cell n)) : nu S ≤ n := by
   obtain ⟨M, _, hM, hcard⟩ := exists_max_matching S
   exact hcard ▸ hM.card_le
 
-/-- Inequality (4.2) of `aristotle.tex`: adding cells raises `ν` by at most their number. -/
+/-- Inequality (4.2) of `main.tex`: adding cells raises `ν` by at most their number. -/
 theorem nu_union_le (S T : Finset (Cell n)) : nu (S ∪ T) ≤ nu S + T.card := by
   obtain ⟨M, hMS, hM, hcard⟩ := exists_max_matching (S ∪ T)
   have h1 : (M ∩ S).card ≤ nu S := le_nu Finset.inter_subset_right (hM.subset Finset.inter_subset_left)
@@ -132,14 +132,14 @@ theorem nu_union_le (S T : Finset (Cell n)) : nu (S ∪ T) ≤ nu S + T.card := 
     _ ≤ nu S + T.card := by omega
 
 /-- Adding a single cell raises `ν` by at most `1` (last clause of Lemma 2.1 of
-`aristotle.tex`, and inequality (4.2) with `|T| = 1`). -/
+`main.tex`, and inequality (4.2) with `|T| = 1`). -/
 theorem nu_insert_le (f : Cell n) (S : Finset (Cell n)) : nu (insert f S) ≤ nu S + 1 := by
   have h := nu_union_le S {f}
   have hu : S ∪ {f} = insert f S := by ext x; simp [Finset.mem_insert]
   rw [hu] at h
   simpa using h
 
-/-- Inequality (4.1) of `aristotle.tex`: a matching meets each line at most once, so deleting a
+/-- Inequality (4.1) of `main.tex`: a matching meets each line at most once, so deleting a
 row `i` from `S` decreases `ν` by at most one. -/
 theorem nu_le_filter_row_succ (S : Finset (Cell n)) (i : Fin n) :
     nu S ≤ nu (S.filter (fun p => p.1 ≠ i)) + 1 := by
@@ -159,7 +159,7 @@ theorem nu_le_filter_row_succ (S : Finset (Cell n)) (i : Fin n) :
   simp only [ne_eq] at h1 h3 ⊢
   omega
 
-/-- Inequality (4.1) of `aristotle.tex` for a column. -/
+/-- Inequality (4.1) of `main.tex` for a column. -/
 theorem nu_le_filter_col_succ (S : Finset (Cell n)) (j : Fin n) :
     nu S ≤ nu (S.filter (fun p => p.2 ≠ j)) + 1 := by
   obtain ⟨M, hMS, hM, hcard⟩ := exists_max_matching S

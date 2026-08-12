@@ -2,7 +2,7 @@ import project.NoDeviation
 import project.Game
 
 /-!
-# Phase 2: the two plans (§3 of `aristotle.tex`)
+# Phase 2: the two plans (§3 of `main.tex`)
 
 At ply `2n-3` X owns exactly the matching `M = nearMatching σ b` of size `n-1` missing row `b`
 and column `d = σ b`, O owns the `n-2` stones `F`, and `(b,d)` is free. X threatens `(b,d)`
@@ -27,7 +27,7 @@ open scoped Classical
 
 variable {n : ℕ}
 
-/-- **Plan (i)** of §3 of `aristotle.tex` against a blocking O: X plays `(b, σ r)` at ply
+/-- **Plan (i)** of §3 of `main.tex` against a blocking O: X plays `(b, σ r)` at ply
 `2n-1`, forcing O to take `(r,d)`, then `(s,d)` at ply `2n+1`, creating the double threat on
 `(b, σ s)` and `(r, σ s)`, and wins at ply `2n+3`. Combined with Lemma 4.6 (all cells X needs
 stay free) and Lemma 4.7 (no defensive deviation, supplied here as `hdev₁`, `hdev₂`). -/
@@ -101,7 +101,7 @@ theorem plan_i {σ : Equiv.Perm (Fin n)} {b r s : Fin n} {F : Finset (Cell n)}
         exact ⟨Or.inr rfl, rfl⟩
       exact this
 
-/-- **Plan (ii)** of §3 of `aristotle.tex` against a blocking O: X plays `(r, d)` at ply
+/-- **Plan (ii)** of §3 of `main.tex` against a blocking O: X plays `(r, d)` at ply
 `2n-1`, forcing O to take `(b, σ r)`, then `(b, σ s)` at ply `2n+1`, creating the double threat
 on `(s, d)` and `(s, σ r)`, and wins at ply `2n+3`. Combined with Lemma 4.6 and Lemma 4.7
 (supplied here as `hdev₁`, `hdev₂`). -/
@@ -175,7 +175,7 @@ theorem plan_ii {σ : Equiv.Perm (Fin n)} {b r s : Fin n} {F : Finset (Cell n)}
       exact this
 
 /-- X's set `M = nearMatching σ b` at ply `2n-3` is completed by the free cell `(b,d)`:
-this is the threat of Corollary 2.2 that forces O's block at ply `2n-2` (§3 of `aristotle.tex`). -/
+this is the threat of Corollary 2.2 that forces O's block at ply `2n-2` (§3 of `main.tex`). -/
 theorem hasTransversal_insert_nearMatching {σ : Equiv.Perm (Fin n)} {b : Fin n} :
     HasTransversal (insert (b, σ b) (nearMatching σ b)) := by
   obtain ⟨-, -, hcomp⟩ := tempo_unique_completing (M := nearMatching σ b) (b := b) (d := σ b)
@@ -185,7 +185,7 @@ theorem hasTransversal_insert_nearMatching {σ : Equiv.Perm (Fin n)} {b : Fin n}
     rw [hcomp]; rfl
   exact hmem
 
-/-- **Rule 3.3** (plan and pair) of `aristotle.tex`, together with Lemmas 4.4, 4.5 and 4.7:
+/-- **Rule 3.3** (plan and pair) of `main.tex`, together with Lemmas 4.4, 4.5 and 4.7:
 after O's forced block of `(b,d)` at ply `2n-2`, X selects a plan according to whether the
 `n-2` O-stones `F` meet column `d` (case C-i), row `b` (case C-ii) or neither (case C-iii),
 and wins with three more stones.
@@ -303,7 +303,7 @@ theorem phase2_after_block {σ : Equiv.Perm (Fin n)} {b : Fin n} {F : Finset (Ce
           (hdev _ (Finset.Subset.refl _) hrowO1 hcolO1)
           (hdev _ (Finset.subset_insert _ _) hrowO2 hcolO2)
 
-/-- The position at ply `2n-3` of `aristotle.tex`, after X's tie-break move: X owns exactly the
+/-- The position at ply `2n-3` of `main.tex`, after X's tie-break move: X owns exactly the
 matching `M = nearMatching σ b` of size `n-1` missing row `b` and column `d = σ b`, O owns the
 `n-2` stones `F`, and `(b,d)` is free. Whatever O plays at ply `2n-2`, that move does not
 complete a transversal (Lemma 4.7(b)) and X still wins with three more stones: if O blocks

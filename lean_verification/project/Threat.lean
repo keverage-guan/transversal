@@ -3,7 +3,7 @@ import project.Basic
 /-!
 # Lemma 2.1 (threat structure) and Corollary 2.2 (tempo)
 
-This file formalises §2 of `aristotle.tex` up to and including Corollary 2.2:
+This file formalises §2 of `main.tex` up to and including Corollary 2.2:
 
 * Lemma 2.1 ("threat structure"): if `ν(S) = n - 1` then the set of cells completing `S`
   is exactly the rectangle `D_R × D_C`, and if `ν(S) ≤ n - 2` no single cell completes `S`;
@@ -57,7 +57,7 @@ theorem image_snd_eq_erase {M : Finset (Cell n)} {q : Fin n} (hM : IsMatching M)
     simp only [Finset.card_univ, Fintype.card_fin]
     omega
 
-/-- The easy inclusion of Lemma 2.1 of `aristotle.tex`: a cell completing `S` lies in
+/-- The easy inclusion of Lemma 2.1 of `main.tex`: a cell completing `S` lies in
 `D_R × D_C`. -/
 theorem exposed_of_completes {S : Finset (Cell n)} (hS : nu S + 1 = n) {f : Cell n}
     (hf : Completes f S) : f.1 ∈ ExposedRows S ∧ f.2 ∈ ExposedCols S := by
@@ -91,7 +91,7 @@ theorem exposed_of_completes {S : Finset (Cell n)} (hS : nu S + 1 = n) {f : Cell
     exact (Finset.ne_of_mem_erase hz) (hM z (Finset.mem_of_mem_erase hz) f hfM (Or.inr h))
   exact ⟨⟨M', hM'S, hM'match, hM'card, hrow⟩, ⟨M', hM'S, hM'match, hM'card, hcol⟩⟩
 
-/-- The hard inclusion of Lemma 2.1 of `aristotle.tex`: every cell of `D_R × D_C` completes `S`.
+/-- The hard inclusion of Lemma 2.1 of `main.tex`: every cell of `D_R × D_C` completes `S`.
 Where the paper argues with an alternating path in `M₁ △ M₂`, we verify Hall's condition for
 the bipartite graph `S` restricted to the rows `≠ p` and the columns `≠ q`. -/
 theorem completes_of_exposed {S : Finset (Cell n)} (hS : nu S + 1 = n) {p q : Fin n}
@@ -278,7 +278,7 @@ theorem completes_of_exposed {S : Finset (Cell n)} (hS : nu S + 1 = n) {p q : Fi
   unfold Completes
   omega
 
-/-- **Lemma 2.1** (threat structure) of `aristotle.tex`: if `ν(S) = n - 1`, then the set of
+/-- **Lemma 2.1** (threat structure) of `main.tex`: if `ν(S) = n - 1`, then the set of
 cells completing `S` is exactly the rectangle `D_R × D_C`, where `D_R` (resp. `D_C`) is the set
 of rows (resp. columns) exposed by some maximum matching of `S`. -/
 theorem threat_structure {S : Finset (Cell n)} (hS : nu S + 1 = n) :
@@ -291,7 +291,7 @@ theorem threat_structure {S : Finset (Cell n)} (hS : nu S + 1 = n) :
     have h := completes_of_exposed hS h1 h2
     simpa using h
 
-/-- **Lemma 2.1** of `aristotle.tex`, in `iff` form. -/
+/-- **Lemma 2.1** of `main.tex`, in `iff` form. -/
 theorem completes_iff {S : Finset (Cell n)} (hS : nu S + 1 = n) (f : Cell n) :
     Completes f S ↔ f.1 ∈ ExposedRows S ∧ f.2 ∈ ExposedCols S := by
   constructor
@@ -300,7 +300,7 @@ theorem completes_iff {S : Finset (Cell n)} (hS : nu S + 1 = n) (f : Cell n) :
     have h := completes_of_exposed hS h1 h2
     simpa using h
 
-/-- Last clause of **Lemma 2.1** of `aristotle.tex`: if `ν(S) ≤ n - 2`, no single cell
+/-- Last clause of **Lemma 2.1** of `main.tex`: if `ν(S) ≤ n - 2`, no single cell
 completes `S`, because adding one cell raises `ν` by at most `1`. -/
 theorem not_completes_of_nu_add_two_le {S : Finset (Cell n)} (hS : nu S + 2 ≤ n) (f : Cell n) :
     ¬ Completes f S := by
@@ -309,7 +309,7 @@ theorem not_completes_of_nu_add_two_le {S : Finset (Cell n)} (hS : nu S + 2 ≤ 
   rw [Completes] at hf
   omega
 
-/-- First remark after Lemma 2.1 of `aristotle.tex`: the rectangle `D_R × D_C` is automatically
+/-- First remark after Lemma 2.1 of `main.tex`: the rectangle `D_R × D_C` is automatically
 disjoint from `S`, so no completing cell is already occupied by the owner of `S`. -/
 theorem notMem_of_mem_exposed {S : Finset (Cell n)} (hS : nu S + 1 = n) {p q : Fin n}
     (hp : p ∈ ExposedRows S) (hq : q ∈ ExposedCols S) : (p, q) ∉ S := by
@@ -320,7 +320,7 @@ theorem notMem_of_mem_exposed {S : Finset (Cell n)} (hS : nu S + 1 = n) {p q : F
 
 /-! ### Corollary 2.2 (tempo) -/
 
-/-- **Corollary 2.2** (tempo) of `aristotle.tex`, first clause: a player holding fewer than
+/-- **Corollary 2.2** (tempo) of `main.tex`, first clause: a player holding fewer than
 `n - 1` stones has `ν ≤ n - 2` and hence no threat. -/
 theorem no_threat_of_card_lt {S : Finset (Cell n)} (hS : S.card + 1 < n) (f : Cell n) :
     ¬ Completes f S := by
@@ -328,7 +328,7 @@ theorem no_threat_of_card_lt {S : Finset (Cell n)} (hS : S.card + 1 < n) (f : Ce
   have := nu_le_card S
   omega
 
-/-- **Corollary 2.2** (tempo) of `aristotle.tex`, second clause: a player holding fewer than `n`
+/-- **Corollary 2.2** (tempo) of `main.tex`, second clause: a player holding fewer than `n`
 stones has not won. -/
 theorem not_hasTransversal_of_card_lt {S : Finset (Cell n)} (hS : S.card < n) :
     ¬ HasTransversal S := by
@@ -341,7 +341,7 @@ theorem not_hasTransversal_of_card_lt {S : Finset (Cell n)} (hS : S.card < n) :
 theorem nu_of_isMatching {M : Finset (Cell n)} (hM : IsMatching M) : nu M = M.card :=
   le_antisymm (nu_le_card M) (le_nu (Finset.Subset.refl M) hM)
 
-/-- **Corollary 2.2** (tempo) of `aristotle.tex`, third clause: if a player's set consists
+/-- **Corollary 2.2** (tempo) of `main.tex`, third clause: if a player's set consists
 exactly of a matching `M` of size `n - 1` missing row `b` and column `d`, then `D_R = {b}`,
 `D_C = {d}` and `(b, d)` is the unique completing cell. -/
 theorem tempo_unique_completing {M : Finset (Cell n)} {b d : Fin n} (hM : IsMatching M)

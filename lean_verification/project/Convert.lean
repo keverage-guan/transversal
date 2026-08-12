@@ -3,7 +3,7 @@ import project.Rectangle
 /-!
 # Transversals and near-perfect matchings as permutations
 
-`aristotle.tex` identifies a transversal with a perfect matching of `K_{n,n}`, i.e. with a
+`main.tex` identifies a transversal with a perfect matching of `K_{n,n}`, i.e. with a
 permutation of the rows, and it writes any matching `M` of size `n-1` missing row `b` and
 column `d` through "the induced bijection `σ : R \ {b} → C \ {d}`" (Lemma 2.3 and §3). This
 file supplies the two dictionary lemmas that make those identifications formal.
@@ -18,7 +18,7 @@ open scoped Classical
 variable {n : ℕ}
 
 /-- A perfect matching of `K_{n,n}`, i.e. a transversal, is the graph of a permutation
-(§1 of `aristotle.tex`, "The board as `K_{n,n}`"). -/
+(§1 of `main.tex`, "The board as `K_{n,n}`"). -/
 theorem exists_perm_of_perfect {M : Finset (Cell n)} (hM : IsMatching M) (hcard : M.card = n) :
     ∃ σ : Equiv.Perm (Fin n), ∀ i, (i, σ i) ∈ M := by
   classical
@@ -43,7 +43,7 @@ theorem exists_perm_of_perfect {M : Finset (Cell n)} (hM : IsMatching M) (hcard 
 
 /-- A set of cells contains a transversal exactly when it contains the graph of a permutation.
 This is the identification of a transversal with a perfect matching of `K_{n,n}` from §1 of
-`aristotle.tex`. -/
+`main.tex`. -/
 theorem hasTransversal_iff_exists_perm {S : Finset (Cell n)} :
     HasTransversal S ↔ ∃ σ : Equiv.Perm (Fin n), ∀ i, (i, σ i) ∈ S := by
   classical
@@ -77,7 +77,7 @@ theorem hasTransversal_iff_exists_perm {S : Finset (Cell n)} :
     exact le_antisymm h2 h1
 
 /-- The bijection `σ : R \ {b} → C \ {d}` induced by a matching `M` of size `n-1` missing row
-`b` and column `d` (§3 of `aristotle.tex`, and the hypothesis of Lemma 2.3): extending it by
+`b` and column `d` (§3 of `main.tex`, and the hypothesis of Lemma 2.3): extending it by
 `b ↦ d` exhibits `M` as `nearMatching σ b`. -/
 theorem exists_perm_of_matching {M : Finset (Cell n)} {b d : Fin n} (hM : IsMatching M)
     (hcard : M.card + 1 = n) (hb : ∀ z ∈ M, z.1 ≠ b) (hd : ∀ z ∈ M, z.2 ≠ d) :

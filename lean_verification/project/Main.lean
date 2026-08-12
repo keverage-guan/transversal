@@ -28,13 +28,13 @@ set_option grind.warning false
 
 
 /-!
-# Theorem A of `aristotle.tex`
+# Theorem A of `main.tex`
 
 > **Theorem A.** Player 1 wins for `n = 1` and for every `n ≥ 4`; `n = 2` is a draw.
 
 This file states Theorem A in the form proved in the rest of the development:
 
-* `n = 1`: `XCanWin 1 ⟨∅, ∅⟩` — X wins with their first stone (§1 of `aristotle.tex`);
+* `n = 1`: `XCanWin 1 ⟨∅, ∅⟩` — X wins with their first stone (§1 of `main.tex`);
 * `n ≥ 4`: `XCanWin (n + 2) ⟨∅, ∅⟩` — X wins with their `(n+2)`-nd stone, i.e. by ply `2n+3`,
   which is the strategy of §3 and the proof of §4;
 * `n = 2`: neither player can force a win, i.e. the game is a draw (§1).
@@ -47,14 +47,14 @@ also proved directly by a pairing strategy for X in `Transversal.no_win_two_O`.
 The remaining case `n = 3` of §1, which the paper quotes from Ranđelović, is proved here by an
 exhaustive kernel-checked search: `Transversal.three_is_a_draw`.
 
-One statement of `aristotle.tex` is not formalised here: the exhaustive computer search showing
+One statement of `main.tex` is not formalised here: the exhaustive computer search showing
 that the bound `2n+3` is optimal for `n = 4, 5, 6` (the section of the paper it refers to is not
 part of the source file).
 -/
 
 namespace Transversal
 
-/-- **Theorem A** of `aristotle.tex`: "Player 1 wins for `n = 1` and for every `n ≥ 4`;
+/-- **Theorem A** of `main.tex`: "Player 1 wins for `n = 1` and for every `n ≥ 4`;
 `n = 2` is a draw."
 
 The three conjuncts are, in order: X wins the `1 × 1` game with their first stone; for every
@@ -67,7 +67,7 @@ theorem theoremA :
       (∀ k, ¬ OCanWin k (⟨∅, ∅⟩ : Position 2)) :=
   ⟨win_one, fun _ hn => theoremA_ge_four hn, no_win_two_X, no_win_two_O⟩
 
-/-- The `3 × 3` case of §1 of `aristotle.tex` ("The `3 × 3` game is likewise a draw"): on the
+/-- The `3 × 3` case of §1 of `main.tex` ("The `3 × 3` game is likewise a draw"): on the
 `3 × 3` board neither player can force a win. -/
 theorem three_is_a_draw :
     (∀ k, ¬ XCanWin k (⟨∅, ∅⟩ : Position 3)) ∧ (∀ k, ¬ OCanWin k (⟨∅, ∅⟩ : Position 3)) :=

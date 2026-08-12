@@ -3,7 +3,7 @@ import project.Threat
 /-!
 # Lemma 2.3 (growth of the threat rectangle) and the remark following it
 
-This file formalises the rest of §2 of `aristotle.tex`:
+This file formalises the rest of §2 of `main.tex`:
 
 * the near-perfect matching `M` of size `n - 1` missing row `b` and column `d`, together with
   the induced bijection `σ : R \ {b} → C \ {d}` (here encoded as a permutation `σ` of the rows
@@ -202,7 +202,7 @@ theorem exposedCols_subset_of_col_conflict {S : Finset (Cell n)} {d e s : Fin n}
 
 /-! ### The near-perfect matching `M` and its bijection `σ` -/
 
-/-- The matching `M` of §2–§3 of `aristotle.tex`: a matching of size `n - 1` missing row `b`
+/-- The matching `M` of §2–§3 of `main.tex`: a matching of size `n - 1` missing row `b`
 and column `d = σ b`, whose induced bijection `R \ {b} → C \ {d}` is the restriction of the
 permutation `σ`. -/
 noncomputable def nearMatching (σ : Equiv.Perm (Fin n)) (b : Fin n) : Finset (Cell n) :=
@@ -367,7 +367,7 @@ theorem swapMatchingCol_subset {s : Fin n} :
 
 /-! ### Lemma 2.3 (growth of the threat rectangle) -/
 
-/-- **Lemma 2.3(a)** of `aristotle.tex`: for `S = M ∪ {(b, σ r)}` we have `ν(S) = n - 1`,
+/-- **Lemma 2.3(a)** of `main.tex`: for `S = M ∪ {(b, σ r)}` we have `ν(S) = n - 1`,
 `D_R = {b, r}`, `D_C = {d}`, so the completing cells are `(b,d)` and `(r,d)`. -/
 theorem rectangle_a {r : Fin n} (hr : r ≠ b) :
     nu (insert (b, σ r) (nearMatching σ b)) + 1 = n ∧
@@ -411,7 +411,7 @@ theorem rectangle_a {r : Fin n} (hr : r ≠ b) :
   refine ⟨hnu, hR, hC, ?_⟩
   rw [threat_structure hnu, hR, hC]
 
-/-- **Lemma 2.3(b)** of `aristotle.tex`: for `S = M ∪ {(r, d)}` we have `ν(S) = n - 1`,
+/-- **Lemma 2.3(b)** of `main.tex`: for `S = M ∪ {(r, d)}` we have `ν(S) = n - 1`,
 `D_R = {b}`, `D_C = {d, σ r}`, so the completing cells are `(b,d)` and `(b, σ r)`. -/
 theorem rectangle_b {r : Fin n} (hr : r ≠ b) :
     nu (insert (r, σ b) (nearMatching σ b)) + 1 = n ∧
@@ -457,7 +457,7 @@ theorem rectangle_b {r : Fin n} (hr : r ≠ b) :
   refine ⟨hnu, hR, hC, ?_⟩
   rw [threat_structure hnu, hR, hC]
 
-/-- **Lemma 2.3(c)** of `aristotle.tex`: for `S = M ∪ {(b, σ r), (s, d)}` with `r ≠ s` we have
+/-- **Lemma 2.3(c)** of `main.tex`: for `S = M ∪ {(b, σ r), (s, d)}` with `r ≠ s` we have
 `ν(S) = n - 1`, `D_R = {b, r}`, `D_C = {d, σ s}`, so the completing cells form the rectangle
 `{b, r} × {d, σ s}`. -/
 theorem rectangle_c {r s : Fin n} (hr : r ≠ b) (hs : s ≠ b) (hrs : r ≠ s) :
@@ -535,7 +535,7 @@ theorem rectangle_c {r s : Fin n} (hr : r ≠ b) (hs : s ≠ b) (hrs : r ≠ s) 
   refine ⟨hnu, hR, hC, ?_⟩
   rw [threat_structure hnu, hR, hC]
 
-/-- **Lemma 2.3(d)** of `aristotle.tex`: for `S = M ∪ {(r, d), (b, σ s)}` with `r ≠ s` we have
+/-- **Lemma 2.3(d)** of `main.tex`: for `S = M ∪ {(r, d), (b, σ s)}` with `r ≠ s` we have
 `ν(S) = n - 1`, `D_R = {b, s}`, `D_C = {d, σ r}`, so the completing cells form the rectangle
 `{b, s} × {d, σ r}`. This is case (c) with the roles of `r` and `s` exchanged. -/
 theorem rectangle_d {r s : Fin n} (hr : r ≠ b) (hs : s ≠ b) (hrs : r ≠ s) :
@@ -547,7 +547,7 @@ theorem rectangle_d {r s : Fin n} (hr : r ≠ b) (hs : s ≠ b) (hrs : r ≠ s) 
   have h := rectangle_c (σ := σ) (b := b) (r := s) (s := r) hs hr (Ne.symm hrs)
   rwa [Finset.insert_comm] at h
 
-/-- **Remark** following Lemma 2.3 of `aristotle.tex`: only cells in row `b` or column `d`
+/-- **Remark** following Lemma 2.3 of `main.tex`: only cells in row `b` or column `d`
 create new completing cells. Adding to `M` a cell `(p, q)` with `p ≠ b` and `q ≠ d` leaves
 `D_R = {b}`, `D_C = {d}`, so `(b,d)` remains the unique completing cell. -/
 theorem rectangle_remark {p q : Fin n} (hp : p ≠ b) (hq : q ≠ σ b) :
