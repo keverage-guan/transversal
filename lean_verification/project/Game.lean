@@ -1,7 +1,7 @@
 import project.Basic
 
 /-!
-# The transversal achievement game (§1 of `main.tex`)
+# The transversal achievement game (§2 of `main.tex`)
 
 Two players alternately claim unoccupied cells of the `n × n` grid; Player 1 (X) moves first.
 A player wins upon owning a transversal, i.e. `n` cells no two of which share a row or a column.
@@ -111,7 +111,7 @@ theorem XCanWin.mono_le {k l : ℕ} {p : Position n} (h : XCanWin k p) (hkl : k 
   | refl => exact h
   | step _ ih => exact ih.mono
 
-/-- "Both cannot win": the fact invoked by the strategy-stealing remark of §1 of
+/-- "Both cannot win": the fact invoked by the strategy-stealing remark of §2 of
 `main.tex`. From a position in which neither player already owns a transversal, the two
 players cannot both have a strategy forcing a win. -/
 theorem not_xCanWin_and_oCanWin : ∀ (k l : ℕ) (p : Position n), ¬ HasTransversal p.X →

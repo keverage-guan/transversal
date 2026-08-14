@@ -2,7 +2,7 @@ import project.Convert
 import project.Game
 
 /-!
-# The small cases `n = 1` and `n = 2` (§1 of `main.tex`)
+# The small cases `n = 1` and `n = 2` (§2 of `main.tex`)
 
 "For `n = 1` the first player wins with their first stone. For `n = 2` the two winning sets are
 the diagonals `A = {(1,1),(2,2)}` and `B = {(1,2),(2,1)}`. O can draw with the strategy of
@@ -31,7 +31,7 @@ theorem win_one : XCanWin 1 (⟨∅, ∅⟩ : Position 1) := by
   simp
 
 /-- On the `2 × 2` board the two transversals are the two diagonals `A = {(1,1),(2,2)}` and
-`B = {(1,2),(2,1)}` of §1 of `main.tex`. -/
+`B = {(1,2),(2,1)}` of §2 of `main.tex`. -/
 theorem hasTransversal_two_iff {S : Finset (Cell 2)} :
     HasTransversal S ↔
       ((((0 : Fin 2), (0 : Fin 2)) ∈ S ∧ ((1 : Fin 2), (1 : Fin 2)) ∈ S) ∨

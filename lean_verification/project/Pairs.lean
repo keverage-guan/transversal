@@ -1,17 +1,17 @@
 import project.Phase1
 
 /-!
-# Live rows and the choice of the pair `(r, s)` (Lemmas 4.4–4.6 of `main.tex`)
+# Live rows and the choice of the pair `(r, s)` (Lemmas 9–11 of `main.tex`)
 
 At ply `2n - 3` X owns exactly the matching `M = nearMatching σ b` of size `n - 1` missing row
 `b` and column `d = σ b`, while O owns the `n - 2` stones `F`. This file formalises:
 
-* the notion of a **live** row of §3 (both `(s,d)` and `(b, σ s)` are free);
+* the notion of a **live** row of §4 (both `(s,d)` and `(b, σ s)` are free);
 * inequality (3.1) of `main.tex`: `ℓ ≥ (n-1) - w`;
-* **Lemma 4.4** (admissible pair): if `w ≤ n - 3` then X can choose a pair `(r,s)` of distinct
+* **Lemma 9** (admissible pair): if `w ≤ n - 3` then X can choose a pair `(r,s)` of distinct
   live rows whose cross cell is free, for either plan;
-* **Lemma 4.5** (admissible pair when `w = 0` and `ν(F) = n - 2`);
-* **Lemma 4.6** (all cells X needs stay free).
+* **Lemma 10** (admissible pair when `w = 0` and `ν(F) = n - 2`);
+* **Lemma 11** (all cells X needs stay free).
 -/
 
 namespace Transversal
@@ -22,7 +22,7 @@ open scoped Classical
 
 variable {n : ℕ}
 
-/-- A row `s ≠ b` is **live** (§3 of `main.tex`) when the cells `(s, d)` and `(b, σ s)` are
+/-- A row `s ≠ b` is **live** (§4 of `main.tex`) when the cells `(s, d)` and `(b, σ s)` are
 both free at ply `2n-3`. Since X's stones form the matching `M = nearMatching σ b`, which misses
 row `b` and column `d = σ b`, these two cells are free exactly when they are not O-stones. -/
 def Live (σ : Equiv.Perm (Fin n)) (b : Fin n) (F : Finset (Cell n)) (s : Fin n) : Prop :=
@@ -37,7 +37,7 @@ theorem mem_liveRows {σ : Equiv.Perm (Fin n)} {b : Fin n} {F : Finset (Cell n)}
     s ∈ liveRows σ b F ↔ Live σ b F s := by
   simp only [liveRows, Finset.mem_filter, Finset.mem_erase, Finset.mem_univ, and_true, Live]
 
-/-- A cross cell `(r, σ s)` with `r ≠ s` is never an X-stone (§4, proof of Lemma 4.4). -/
+/-- A cross cell `(r, σ s)` with `r ≠ s` is never an X-stone (§5, proof of Lemma 9). -/
 theorem cross_notMem_nearMatching {σ : Equiv.Perm (Fin n)} {b r s : Fin n} (hrs : r ≠ s) :
     (r, σ s) ∉ nearMatching σ b := by
   intro h
@@ -91,7 +91,7 @@ theorem card_live_ge {σ : Equiv.Perm (Fin n)} {b : Fin n} {F : Finset (Cell n)}
         exact σ.injective (congrArg Prod.snd hst')
   omega
 
-/-- **Lemma 4.4** (admissible pair) of `main.tex`: if `w ≤ n - 3`, then X can choose an
+/-- **Lemma 9** (admissible pair) of `main.tex`: if `w ≤ n - 3`, then X can choose an
 ordered pair `(r, s)` of distinct live rows whose cross cell `(r, σ s)` is free, i.e. neither an
 O-stone nor an X-stone. Exchanging `r` and `s` gives the pair required by plan (ii), whose cross
 cell is `(s, σ r)`. -/
@@ -152,7 +152,7 @@ theorem exists_admissible_pair {σ : Equiv.Perm (Fin n)} {b : Fin n} {F : Finset
   intro hmem
   exact hz' (Finset.mem_filter.2 ⟨hz, hmem⟩)
 
-/-- **Lemma 4.5** (admissible pair when `w = 0` and `ν(F) = n - 2`) of `main.tex`. Here `e`
+/-- **Lemma 10** (admissible pair when `w = 0` and `ν(F) = n - 2`) of `main.tex`. Here `e`
 is X's last Phase-1 row `u_a` and `F` is a perfect matching of `A × B`, so that `F` misses the
 rows `b, e` and the columns `d = σ b`, `σ e = v_c`. Then every row `≠ b` is live, some live
 `r ∉ {b, e}` exists, and for the pair `(r, s) = (r, e)` the cross cell `(r, σ e)` is
@@ -183,7 +183,7 @@ theorem pair_of_w_zero {σ : Equiv.Perm (Fin n)} {b e : Fin n} (hbe : e ≠ b) (
   intro hmem
   exact (hFcol _ hmem).2 rfl
 
-/-- **Lemma 4.6** (all cells X needs stay free) of `main.tex`, for plan (i): the cells
+/-- **Lemma 11** (all cells X needs stay free) of `main.tex`, for plan (i): the cells
 `(b,d) , (r,d) , (b,σ r) , (s,d) , (b,σ s) , (r,σ s)` occurring between plies `2n-3` and `2n+3`
 are pairwise distinct, so each cell X's plan requires is still free when X needs it. -/
 theorem plan_i_cells_distinct {σ : Equiv.Perm (Fin n)} {b r s : Fin n}

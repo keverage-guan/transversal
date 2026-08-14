@@ -2,15 +2,15 @@ import project.Phase2
 import project.Convert
 
 /-!
-# Phase 1 and the proof of Theorem A for `n ≥ 4` (§§3–4 of `main.tex`)
+# Phase 1 and the proof of Theorem A for `n ≥ 4` (§4–5 of `main.tex`)
 
-This file runs X's strategy of §3 of `main.tex` from the empty board:
+This file runs X's strategy of §4 of `main.tex` from the empty board:
 
 * `freeRows`, `freeCols` and `openBlock` are the sets `U_R`, `U_C` and `H = U_R × U_C`;
 * `Phase1Inv k p` is the state of the game with X to move after `k` moves each: X's stones form
-  a matching of size `k`, O has `k` stones, and Invariant 3.1 holds up to O's latest stone;
-* `phase1_win` is the induction over X's Phase-1 moves `1, …, n-2` (Lemma 4.1);
-* `phase1_base` is X's move `n-1`, the tie-break of §3 (Lemmas 4.2 and 4.3), after which
+  a matching of size `k`, O has `k` stones, and Invariant 1 holds up to O's latest stone;
+* `phase1_win` is the induction over X's Phase-1 moves `1, …, n-2` (Lemma 5);
+* `phase1_base` is X's move `n-1`, the tie-break of §4 (Lemmas 6 and 8), after which
   `phase2_after_tiebreak` finishes the game;
 * `theoremA_ge_four` is Theorem A for `n ≥ 4`: X wins with their `(n+2)`-nd stone, i.e. by ply
   `2n+3`.
@@ -24,10 +24,10 @@ open scoped Classical
 
 variable {n : ℕ}
 
-/-- `U_R`, the set of rows containing no X-stone (§3 of `main.tex`, Phase 1). -/
+/-- `U_R`, the set of rows containing no X-stone (§4 of `main.tex`, Phase 1). -/
 def freeRows (S : Finset (Cell n)) : Finset (Fin n) := Finset.univ \ S.image Prod.fst
 
-/-- `U_C`, the set of columns containing no X-stone (§3 of `main.tex`, Phase 1). -/
+/-- `U_C`, the set of columns containing no X-stone (§4 of `main.tex`, Phase 1). -/
 def freeCols (S : Finset (Cell n)) : Finset (Fin n) := Finset.univ \ S.image Prod.snd
 
 theorem mem_freeRows {S : Finset (Cell n)} {x : Fin n} :
@@ -52,7 +52,7 @@ theorem mem_freeCols {S : Finset (Cell n)} {x : Fin n} :
     obtain ⟨z, hz, hzx⟩ := Finset.mem_image.1 hmem
     exact h z hz hzx
 
-/-- After `k` X-moves forming a matching, `|U_R| = n - k` (§3 of `main.tex`). -/
+/-- After `k` X-moves forming a matching, `|U_R| = n - k` (§4 of `main.tex`). -/
 theorem card_freeRows {S : Finset (Cell n)} (hS : IsMatching S) :
     (freeRows S).card + S.card = n := by
   have h := Finset.card_sdiff_add_card_eq_card (Finset.subset_univ (S.image Prod.fst))
@@ -65,7 +65,7 @@ theorem card_freeCols {S : Finset (Cell n)} (hS : IsMatching S) :
   rw [hS.card_image_snd] at h
   simpa [freeCols] using h
 
-/-- Playing a cell of the open block deletes its row from `U_R` (§3 of `main.tex`). -/
+/-- Playing a cell of the open block deletes its row from `U_R` (§4 of `main.tex`). -/
 theorem freeRows_insert {S : Finset (Cell n)} {c : Cell n} :
     freeRows (insert c S) = (freeRows S).erase c.1 := by
   ext x
@@ -93,7 +93,7 @@ theorem freeCols_insert {S : Finset (Cell n)} {c : Cell n} :
     · exact h z hz'
 
 /-- The state of the game with X to move, after `k` moves by each player: X's `k` stones form a
-matching, O has `k` stones, and **Invariant 3.1** of `main.tex` holds in the weak form that
+matching, O has `k` stones, and **Invariant 1** of `main.tex` holds in the weak form that
 the only O-stone possibly lying in the open block `H = U_R × U_C` is O's latest stone. -/
 structure Phase1Inv (k : ℕ) (p : Position n) : Prop where
   /-- X's stones form a matching (they lie in successive open blocks). -/
@@ -102,7 +102,7 @@ structure Phase1Inv (k : ℕ) (p : Position n) : Prop where
   cardX : p.X.card = k
   /-- O has played `k` stones. -/
   cardO : p.O.card = k
-  /-- Invariant 3.1: at most one O-stone (the latest) lies in the open block. -/
+  /-- Invariant 1: at most one O-stone (the latest) lies in the open block. -/
   block : ∃ x, ∀ z ∈ p.O, z ∈ openBlock (freeRows p.X) (freeCols p.X) → z = x
 
 /-- `other x y a ∈ {x, y}`. -/
@@ -118,8 +118,8 @@ theorem other_ne_self {x y a : Fin n} (hxy : y ≠ x) (ha : a = x ∨ a = y) : o
   · rw [other_left]; exact hxy
   · rw [other_right hxy]; exact fun h => hxy h.symm
 
-/-- **X's move `n-1`**: the tie-break of §3 of `main.tex` (Lemmas 4.2 and 4.3), followed by
-Phase 2. With `k = n - 2` stones each and Invariant 3.1 in force, X wins with four more
+/-- **X's move `n-1`**: the tie-break of §4 of `main.tex` (Lemmas 6 and 8), followed by
+Phase 2. With `k = n - 2` stones each and Invariant 1 in force, X wins with four more
 stones, i.e. by ply `2n+3`. -/
 theorem phase1_base {k : ℕ} (hn : 4 ≤ n) (hk : k + 2 = n) {p : Position n}
     (hinv : Phase1Inv k p) : XCanWin 4 p := by
@@ -141,7 +141,7 @@ theorem phase1_base {k : ℕ} (hn : 4 ≤ n) (hk : k + 2 = n) {p : Position n}
     intro x; rw [hURset]; simp
   have hmemC : ∀ x : Fin n, x ∈ freeCols p.X ↔ (x = v₁ ∨ x = v₂) := by
     intro x; rw [hUCset]; simp
-  -- Invariant 3.1: at most one O-stone lies in the open block
+  -- Invariant 1: at most one O-stone lies in the open block
   obtain ⟨xstone, hxstone⟩ := hinv.block
   have hFH : (F.filter (fun z => (z.1 = u₁ ∨ z.1 = u₂) ∧ (z.2 = v₁ ∨ z.2 = v₂))).card ≤ 1 := by
     have hsub : F.filter (fun z => (z.1 = u₁ ∨ z.1 = u₂) ∧ (z.2 = v₁ ∨ z.2 = v₂)) ⊆
@@ -154,7 +154,7 @@ theorem phase1_base {k : ℕ} (hn : 4 ≤ n) (hk : k + 2 = n) {p : Position n}
       exact ⟨(hmemR _).2 hz.2.1, (hmemC _).2 hz.2.2⟩
     have := Finset.card_le_card hsub
     simpa using this
-  -- **X's tie-break** (§3 of `main.tex`): prefer an admissible outcome with `1 ≤ w ≤ n-3`
+  -- **X's tie-break** (§4 of `main.tex`): prefer an admissible outcome with `1 ≤ w ≤ n-3`
   obtain ⟨b, d, hb, hd, hbdF, hoppF, hw, hstruct0⟩ :
       ∃ b d, (b = u₁ ∨ b = u₂) ∧ (d = v₁ ∨ d = v₂) ∧ (b, d) ∉ F ∧
         (other u₁ u₂ b, other v₁ v₂ d) ∉ F ∧ wParam F b d + 3 ≤ n ∧
@@ -172,7 +172,7 @@ theorem phase1_base {k : ℕ} (hn : 4 ≤ n) (hk : k + 2 = n) {p : Position n}
         push_neg
         exact ⟨hrow z hz, hcol z hz⟩
       omega
-    · -- no admissible outcome has `1 ≤ w ≤ n-3`; Lemma 4.2 still gives one with `w ≤ n-3`
+    · -- no admissible outcome has `1 ≤ w ≤ n-3`; Lemma 6 still gives one with `w ≤ n-3`
       obtain ⟨b, d, hb, hd, hbdF, hoppF, hw⟩ :=
         tiebreak_exists (Ne.symm hu12) (Ne.symm hv12) hFcard hn hFH
       push_neg at hgood
@@ -260,7 +260,7 @@ theorem phase1_base {k : ℕ} (hn : 4 ≤ n) (hk : k + 2 = n) {p : Position n}
   rw [hσe]
   exact (hstruct0 hrow hcol hnu z hz).2
 
-/-- **Lemma 4.1** (feasibility of Phase 1) of `main.tex`, run as an induction over X's
+/-- **Lemma 5** (feasibility of Phase 1) of `main.tex`, run as an induction over X's
 Phase-1 moves: from any position satisfying `Phase1Inv k` with `k + m + 2 = n`, X wins with
 `m + 4` further stones. -/
 theorem phase1_win (hn : 4 ≤ n) : ∀ (m k : ℕ), k + m + 2 = n → ∀ p : Position n,

@@ -6,22 +6,22 @@ Exhaustive verification of the upper bound "X wins by ply 2n+3" for the
 transversal achievement game on the n x n board.
 
 The script implements the strategy of Section 4 of the accompanying note
-(Phase-1 rule of Sec. 3, tie-break of Sec. 5, plan/pair rule 4.3, deviation
+(Phase-1 rule of Sec. 4, tie-break of Sec. 4, plan/pair rule 4.3, deviation
 rule 4.4) and plays it against EVERY legal defence by O, checking at every
 node the claims the proof asserts:
 
     (I)    open-block invariant: H = U_R x U_C contains no O-stone
-           throughout Phase 1                                        [Lemma 4]
+           throughout Phase 1                            [Invariant 1; Lemma 5]
     (T)    after X's move n-1: (b,d) is free, X's stones are a matching of
-           size n-1 missing row b and column d, and w <= n-3         [Sec. 5]
+           size n-1 missing row b and column d, and w <= n-3 [Sec. 4; Lemma 6]
     (S)    X's moves at plies 2n-3 and 2n-1 leave exactly ONE free
            completing cell  (a single, forcing threat)          [Lemma 3(a,b)]
     (D)    X's move at ply 2n+1 leaves exactly TWO free completing cells
            (a genuine double threat)                            [Lemma 3(c,d)]
     (Ca)   O has no threat when X is to move at plies 2n-1 and 2n+1
-                                                                  [Claim C(a)]
+                                                                [Lemma 12(a)]
     (Cb)   no legal O move at plies 2n-2, 2n or 2n+2 completes a transversal
-           for O                                                  [Claim C(b)]
+           for O                                                [Lemma 12(b)]
     (W)    X completes a transversal at a ply <= 2n+3
 
 Only the UPPER bound is verified.  Nothing here speaks to optimality of
@@ -276,7 +276,7 @@ class VerificationError(AssertionError):
 
 
 def phase1_candidates(st):
-    """All cells X may play under the Phase-1 rule of Sec. 3 (moves 1..n-2)."""
+    """All cells X may play under the Phase-1 rule of Sec. 4 (moves 1..n-2)."""
     n = st.n
     k = len(st.x_moves) + 1
     if k == 1:
@@ -292,12 +292,12 @@ def phase1_candidates(st):
     else:
         cand = [cell for cell in H if st.free(cell)]
     if not cand:
-        raise VerificationError("Phase-1 rule not executable (contradicts Lemma 4)")
+        raise VerificationError("Phase-1 rule not executable (contradicts Lemma 5)")
     return cand
 
 
 def tiebreak_candidates(st):
-    """All cells X may play at move n-1 under the tie-break of Sec. 5.
+    """All cells X may play at move n-1 under the tie-break of Sec. 4.
 
     Returns a list of (cell, b, d, w).  An outcome is *admissible* if the
     cell and its opposite corner in H are both free (this is what keeps
@@ -321,13 +321,14 @@ def tiebreak_candidates(st):
             w = sum(1 for (orow, ocol) in F if orow == b or ocol == d)
             outcomes.append((cell, b, d, w))
     if not outcomes:
-        raise VerificationError("no admissible tie-break cell (contradicts Sec. 5)")
+        raise VerificationError(
+            "no admissible tie-break cell (contradicts Invariant 1 / Lemma 5)")
     preferred = [out for out in outcomes if 1 <= out[3] <= n - 3]
     if preferred:
         return preferred
     fallback = [out for out in outcomes if out[3] <= n - 3]
     if not fallback:
-        raise VerificationError("no outcome with w <= n-3 (contradicts Claim A)")
+        raise VerificationError("no outcome with w <= n-3 (contradicts Lemma 6)")
     return fallback
 
 
@@ -377,13 +378,13 @@ def build_context(st, b, d, tiebreak_cell):
             plan, case = "i", "C-iii(nu=n-2)"
             # Rule 4.3: s := u_a, r any live row != u_a.
             if ua not in live:
-                raise VerificationError("u_a is not live (contradicts Claim B')")
+                raise VerificationError("u_a is not live (contradicts Lemma 10)")
             pairs = [(r, ua) for r in live
                      if r != ua and st.free((r, sigma[ua]))]
 
     if not pairs:
         raise VerificationError(f"no admissible (r,s) pair in case {case} "
-                                f"(contradicts Claim B/B')")
+                                f"(contradicts Lemma 9 / Lemma 10)")
     return dict(b=b, d=d, sigma=sigma, w=w, nuF=nuF, live=live,
                 plan=plan, case=case, pairs=pairs, ua=ua)
 
@@ -543,7 +544,7 @@ class Verifier:
                 st.unplay(cell, "X")
             return
 
-        # Move n-1: the tie-break of Sec. 5.
+        # Move n-1: the tie-break of Sec. 4.
         if k == n - 1:
             outs = tiebreak_candidates(st)
             if not self.all_x:
@@ -575,11 +576,11 @@ class Verifier:
         othr = st.free_completions("O")
         if othr:
             raise VerificationError(
-                f"Claim C(a) fails at ply {ply}: O threatens {othr}")
+                f"Lemma 12(a) fails at ply {ply}: O threatens {othr}")
         cell = planned_move(st.ctx, which)
         if not st.free(cell):
             raise VerificationError(
-                f"planned move {cell} is occupied at ply {ply} (contradicts Lemma 5)")
+                f"planned move {cell} is occupied at ply {ply} (contradicts Lemma 11)")
         st.play(cell, "X")
         thr = st.free_completions("X")
         expected = 1 if which == 1 else 2
@@ -604,7 +605,7 @@ class Verifier:
             # (Cb) / general safety: O must not complete a transversal.
             if st.has_transversal("O"):
                 raise VerificationError(
-                    f"Claim C(b) FAILS: O completes a transversal at ply {ply} "
+                    f"Lemma 12(b) FAILS: O completes a transversal at ply {ply} "
                     f"with {cell}")
             if forced and cell in threats:
                 self.block_cells[cell] += 1
@@ -621,13 +622,13 @@ class Verifier:
             st.unplay(cell, "O")
 
     def check_invariant_I(self, st):
-        """Verify that no O-stone lies inside the current open block H."""
+        """Verify that no O-stone lies inside the current open block H (Invariant 1)."""
         UR, UC = st.open_block()
         URs, UCs = set(UR), set(UC)
         for (r, c) in st.o_moves:
             if r in URs and c in UCs:
                 raise VerificationError(
-                    f"invariant (I) fails: O-stone {(r,c)} lies in the open block")
+                    f"Invariant 1 fails: O-stone {(r,c)} lies in the open block")
 
     # -- output --
 

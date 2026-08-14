@@ -3,7 +3,7 @@ import project.Game
 import project.Stealing
 
 /-!
-# The `3 × 3` game is a draw (§1 of `main.tex`)
+# The `3 × 3` game is a draw (§2 of `main.tex`)
 
 > "The `3 × 3` game is likewise a draw, proved by hand in [Ranđelović]."
 
@@ -13,7 +13,7 @@ positions of the `3 × 3` board (the two players' stones being given as lists of
 certifies "with X to move, X cannot force a win", and `not_xCanWin_of_oSafeL` shows that such a
 certificate really does refute `XCanWin k p` for every `k`. Evaluating `oSafeL 5 [] []` gives
 `no_win_three_X`, and `no_win_three_O` follows from the strategy-stealing theorem
-`player_two_never_wins` of §1. Together they say that the `3 × 3` game is a draw.
+`player_two_never_wins` of §2. Together they say that the `3 × 3` game is a draw.
 -/
 
 namespace Transversal
@@ -21,7 +21,7 @@ namespace Transversal
 open Finset
 
 /-- The six permutations of `Fin 3`, as functions; the transversals of the `3 × 3` board are
-exactly the graphs of these (§1 of `main.tex`, "The board as `K_{n,n}`"). -/
+exactly the graphs of these (§2 of `main.tex`, "The board as `K_{n,n}`"). -/
 def perms3 : List (Fin 3 → Fin 3) :=
   [![0, 1, 2], ![0, 2, 1], ![1, 0, 2], ![1, 2, 0], ![2, 0, 1], ![2, 1, 0]]
 
@@ -149,13 +149,13 @@ theorem not_xCanWin_of_oSafeL :
 /-- The exhaustive search: on the empty `3 × 3` board, X cannot force a win. -/
 theorem oSafeL_empty_three : oSafeL 5 [] [] = true := by decide
 
-/-- **The `3 × 3` game is a draw** (§1 of `main.tex`), first half: Player 1 cannot force a
+/-- **The `3 × 3` game is a draw** (§2 of `main.tex`), first half: Player 1 cannot force a
 win on the `3 × 3` board. -/
 theorem no_win_three_X : ∀ k, ¬ XCanWin k (⟨∅, ∅⟩ : Position 3) :=
   not_xCanWin_of_oSafeL 5 [] [] _ rfl rfl oSafeL_empty_three
 
-/-- **The `3 × 3` game is a draw** (§1 of `main.tex`), second half: Player 2 cannot force a
-win either. This is the strategy-stealing remark of §1, i.e. `player_two_never_wins`. -/
+/-- **The `3 × 3` game is a draw** (§2 of `main.tex`), second half: Player 2 cannot force a
+win either. This is the strategy-stealing remark of §2, i.e. `player_two_never_wins`. -/
 theorem no_win_three_O : ∀ k, ¬ OCanWin k (⟨∅, ∅⟩ : Position 3) :=
   fun k => player_two_never_wins (by norm_num) k
 

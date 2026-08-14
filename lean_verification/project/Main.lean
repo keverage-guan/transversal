@@ -34,22 +34,21 @@ set_option grind.warning false
 
 This file states Theorem A in the form proved in the rest of the development:
 
-* `n = 1`: `XCanWin 1 ⟨∅, ∅⟩` — X wins with their first stone (§1 of `main.tex`);
+* `n = 1`: `XCanWin 1 ⟨∅, ∅⟩` — X wins with their first stone (§2 of `main.tex`);
 * `n ≥ 4`: `XCanWin (n + 2) ⟨∅, ∅⟩` — X wins with their `(n+2)`-nd stone, i.e. by ply `2n+3`,
-  which is the strategy of §3 and the proof of §4;
-* `n = 2`: neither player can force a win, i.e. the game is a draw (§1).
+  which is the strategy of §4 and the proof of §5;
+* `n = 2`: neither player can force a win, i.e. the game is a draw (§2).
 
-The strategy-stealing remark of §1 ("Player 2 never wins", for every `n`) is
+The strategy-stealing remark of §2 ("Player 2 never wins", for every `n`) is
 `Transversal.player_two_never_wins`; its ingredient that both players cannot force a win is
 `Transversal.not_xCanWin_and_oCanWin`. For `n = 2`, the case Theorem A needs, the conclusion is
 also proved directly by a pairing strategy for X in `Transversal.no_win_two_O`.
 
-The remaining case `n = 3` of §1, which the paper quotes from Ranđelović, is proved here by an
+The remaining case `n = 3` of §2, which the paper quotes from Ranđelović, is proved here by an
 exhaustive kernel-checked search: `Transversal.three_is_a_draw`.
 
 One statement of `main.tex` is not formalised here: the exhaustive computer search showing
-that the bound `2n+3` is optimal for `n = 4, 5, 6` (the section of the paper it refers to is not
-part of the source file).
+that the bound `2n+3` is optimal for `n = 4, 5, 6`.
 -/
 
 namespace Transversal
@@ -67,7 +66,7 @@ theorem theoremA :
       (∀ k, ¬ OCanWin k (⟨∅, ∅⟩ : Position 2)) :=
   ⟨win_one, fun _ hn => theoremA_ge_four hn, no_win_two_X, no_win_two_O⟩
 
-/-- The `3 × 3` case of §1 of `main.tex` ("The `3 × 3` game is likewise a draw"): on the
+/-- The `3 × 3` case of §2 of `main.tex` ("The `3 × 3` game is likewise a draw"): on the
 `3 × 3` board neither player can force a win. -/
 theorem three_is_a_draw :
     (∀ k, ¬ XCanWin k (⟨∅, ∅⟩ : Position 3)) ∧ (∀ k, ¬ OCanWin k (⟨∅, ∅⟩ : Position 3)) :=

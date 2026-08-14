@@ -2,11 +2,11 @@ import project.NoDeviation
 import project.Game
 
 /-!
-# Phase 2: the two plans (§3 of `main.tex`)
+# Phase 2: the two plans (§4 of `main.tex`)
 
 At ply `2n-3` X owns exactly the matching `M = nearMatching σ b` of size `n-1` missing row `b`
 and column `d = σ b`, O owns the `n-2` stones `F`, and `(b,d)` is free. X threatens `(b,d)`
-(Corollary 2.2), so O must block it at ply `2n-2`.
+(Corollary 2), so O must block it at ply `2n-2`.
 
 This file proves that, from the resulting position, X wins with three more stones (plies
 `2n-1, 2n+1, 2n+3`):
@@ -27,7 +27,7 @@ open scoped Classical
 
 variable {n : ℕ}
 
-/-- **Plan (i)** of §3 of `main.tex` against a blocking O: X plays `(b, σ r)` at ply
+/-- **Plan (i)** of §4 of `main.tex` against a blocking O: X plays `(b, σ r)` at ply
 `2n-1`, forcing O to take `(r,d)`, then `(s,d)` at ply `2n+1`, creating the double threat on
 `(b, σ s)` and `(r, σ s)`, and wins at ply `2n+3`. Combined with Lemma 4.6 (all cells X needs
 stay free) and Lemma 4.7 (no defensive deviation, supplied here as `hdev₁`, `hdev₂`). -/
@@ -101,7 +101,7 @@ theorem plan_i {σ : Equiv.Perm (Fin n)} {b r s : Fin n} {F : Finset (Cell n)}
         exact ⟨Or.inr rfl, rfl⟩
       exact this
 
-/-- **Plan (ii)** of §3 of `main.tex` against a blocking O: X plays `(r, d)` at ply
+/-- **Plan (ii)** of §4 of `main.tex` against a blocking O: X plays `(r, d)` at ply
 `2n-1`, forcing O to take `(b, σ r)`, then `(b, σ s)` at ply `2n+1`, creating the double threat
 on `(s, d)` and `(s, σ r)`, and wins at ply `2n+3`. Combined with Lemma 4.6 and Lemma 4.7
 (supplied here as `hdev₁`, `hdev₂`). -/
@@ -175,7 +175,7 @@ theorem plan_ii {σ : Equiv.Perm (Fin n)} {b r s : Fin n} {F : Finset (Cell n)}
       exact this
 
 /-- X's set `M = nearMatching σ b` at ply `2n-3` is completed by the free cell `(b,d)`:
-this is the threat of Corollary 2.2 that forces O's block at ply `2n-2` (§3 of `main.tex`). -/
+this is the threat of Corollary 2 that forces O's block at ply `2n-2` (§4 of `main.tex`). -/
 theorem hasTransversal_insert_nearMatching {σ : Equiv.Perm (Fin n)} {b : Fin n} :
     HasTransversal (insert (b, σ b) (nearMatching σ b)) := by
   obtain ⟨-, -, hcomp⟩ := tempo_unique_completing (M := nearMatching σ b) (b := b) (d := σ b)
