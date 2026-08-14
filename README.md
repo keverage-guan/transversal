@@ -86,7 +86,3 @@ The development is organized to track the paper:
 ```
 
 MSC: 91A05, 05C57, 91A43, 91A46.
-
-## License
-
-The paper is released under CC BY-ND 4.0. The verification and figure code is placed in the public domain (CC0).
