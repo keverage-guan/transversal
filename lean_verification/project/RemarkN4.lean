@@ -2,7 +2,7 @@ import project.Convert
 import project.Game
 
 /-!
-# The `n = 4` remark of §4 of `main.tex`
+# The `n = 4` remark of §5 of `main.tex`
 
 > **Remark (why a stronger statement is false).** Take `n = 4`, X `= {(1,1),(2,2),(3,3)}` and
 > `F = {(1,2),(2,1)}` at ply `5 = 2n-3` […]. Plan (i) with `s = u_a = 3`, `r = 1` gives the line
@@ -17,7 +17,7 @@ namespace Transversal
 
 open Finset
 
-/-- **The remark after Lemma 4.7** of `main.tex`: in the stated `n = 4` line, after O's
+/-- **Remark 13 following Lemma 12** of `main.tex`: in the stated `n = 4` line, after O's
 block at ply `2n+2 = 10` O threatens the free cell `(3,2)` of the paper — so no claim about O's
 threats after ply `2n+2` can be made — and this is harmless because X completes a transversal
 first, at ply `2n+3 = 11`, by playing the paper's cell `(4,3)`. -/

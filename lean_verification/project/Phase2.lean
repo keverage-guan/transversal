@@ -12,10 +12,10 @@ This file proves that, from the resulting position, X wins with three more stone
 `2n-1, 2n+1, 2n+3`):
 
 * `plan_i`: plan (i) — X plays `(b, σ r)` then `(s, d)`, creating the double threat
-  `{b,r} × {d, σ s}` of Lemma 2.3(c);
-* `plan_ii`: plan (ii) — the mirror plan through Lemma 2.3(b),(d).
+  `{b,r} × {d, σ s}` of Lemma 3(c);
+* `plan_ii`: plan (ii) — the mirror plan through Lemma 3(b),(d).
 
-The hypotheses `hdev₁`, `hdev₂` are exactly Lemma 4.7(b): no move of O at plies `2n` and `2n+2`
+The hypotheses `hdev₁`, `hdev₂` are exactly Lemma 12(b): no move of O at plies `2n` and `2n+2`
 completes a transversal.
 -/
 
@@ -29,8 +29,8 @@ variable {n : ℕ}
 
 /-- **Plan (i)** of §4 of `main.tex` against a blocking O: X plays `(b, σ r)` at ply
 `2n-1`, forcing O to take `(r,d)`, then `(s,d)` at ply `2n+1`, creating the double threat on
-`(b, σ s)` and `(r, σ s)`, and wins at ply `2n+3`. Combined with Lemma 4.6 (all cells X needs
-stay free) and Lemma 4.7 (no defensive deviation, supplied here as `hdev₁`, `hdev₂`). -/
+`(b, σ s)` and `(r, σ s)`, and wins at ply `2n+3`. Combined with Lemma 11 (all cells X needs
+stay free) and Lemma 12 (no defensive deviation, supplied here as `hdev₁`, `hdev₂`). -/
 theorem plan_i {σ : Equiv.Perm (Fin n)} {b r s : Fin n} {F : Finset (Cell n)}
     (hlr : Live σ b F r) (hls : Live σ b F s) (hrs : r ≠ s) (hcross : (r, σ s) ∉ F)
     (hdev₁ : ∀ g ∉ nearMatching σ b, ¬ HasTransversal (insert g (insert (b, σ b) F)))
@@ -103,7 +103,7 @@ theorem plan_i {σ : Equiv.Perm (Fin n)} {b r s : Fin n} {F : Finset (Cell n)}
 
 /-- **Plan (ii)** of §4 of `main.tex` against a blocking O: X plays `(r, d)` at ply
 `2n-1`, forcing O to take `(b, σ r)`, then `(b, σ s)` at ply `2n+1`, creating the double threat
-on `(s, d)` and `(s, σ r)`, and wins at ply `2n+3`. Combined with Lemma 4.6 and Lemma 4.7
+on `(s, d)` and `(s, σ r)`, and wins at ply `2n+3`. Combined with Lemma 11 and Lemma 12
 (supplied here as `hdev₁`, `hdev₂`). -/
 theorem plan_ii {σ : Equiv.Perm (Fin n)} {b r s : Fin n} {F : Finset (Cell n)}
     (hlr : Live σ b F r) (hls : Live σ b F s) (hrs : r ≠ s) (hcross : (s, σ r) ∉ F)
@@ -185,12 +185,12 @@ theorem hasTransversal_insert_nearMatching {σ : Equiv.Perm (Fin n)} {b : Fin n}
     rw [hcomp]; rfl
   exact hmem
 
-/-- **Rule 3.3** (plan and pair) of `main.tex`, together with Lemmas 4.4, 4.5 and 4.7:
+/-- **Rule 8** (plan and pair) of `main.tex`, together with Lemmas 9, 10 and 12:
 after O's forced block of `(b,d)` at ply `2n-2`, X selects a plan according to whether the
 `n-2` O-stones `F` meet column `d` (case C-i), row `b` (case C-ii) or neither (case C-iii),
 and wins with three more stones.
 
-The hypothesis `hstruct` is the conclusion of Lemma 4.3 (structure of `F` when `w = 0`) in the
+The hypothesis `hstruct` is the conclusion of Lemma 8 (structure of `F` when `w = 0`) in the
 sub-case `ν(F) = n-2`: `e` is X's last Phase-1 row `u_a`, which `F` misses in both coordinates. -/
 theorem phase2_after_block {σ : Equiv.Perm (Fin n)} {b : Fin n} {F : Finset (Cell n)}
     (hn : 4 ≤ n) (hFcard : F.card + 2 = n) (hw : wParam F b (σ b) + 3 ≤ n)
@@ -257,7 +257,7 @@ theorem phase2_after_block {σ : Equiv.Perm (Fin n)} {b : Fin n} {F : Finset (Ce
           · exact hO1 z h
         exact plan_i hlr hls hrs hcross (fun g _ => (nodeviation_col hO1 hFfil).2.2 g)
           (fun g _ => (nodeviation_col hO2 hFfil).2.2 g)
-      · -- sub-case `ν(F) = n-2`: `F` is a perfect matching of `A × B` (Lemma 4.3)
+      · -- sub-case `ν(F) = n-2`: `F` is a perfect matching of `A × B` (Lemma 8)
         have hnu2 : nu F + 2 = n := by
           have := nu_le_card F
           omega
@@ -306,8 +306,8 @@ theorem phase2_after_block {σ : Equiv.Perm (Fin n)} {b : Fin n} {F : Finset (Ce
 /-- The position at ply `2n-3` of `main.tex`, after X's tie-break move: X owns exactly the
 matching `M = nearMatching σ b` of size `n-1` missing row `b` and column `d = σ b`, O owns the
 `n-2` stones `F`, and `(b,d)` is free. Whatever O plays at ply `2n-2`, that move does not
-complete a transversal (Lemma 4.7(b)) and X still wins with three more stones: if O blocks
-`(b,d)` this is `phase2_after_block`, and otherwise X plays `(b,d)` at once (Rule 3.4). -/
+complete a transversal (Lemma 12(b)) and X still wins with three more stones: if O blocks
+`(b,d)` this is `phase2_after_block`, and otherwise X plays `(b,d)` at once (Rule 4.4). -/
 theorem phase2_after_tiebreak {σ : Equiv.Perm (Fin n)} {b : Fin n} {F : Finset (Cell n)}
     (hn : 4 ≤ n) (hFcard : F.card + 2 = n) (hbd : (b, σ b) ∉ F) (hw : wParam F b (σ b) + 3 ≤ n)
     (hstruct : (∀ z ∈ F, z.1 ≠ b) → (∀ z ∈ F, z.2 ≠ σ b) → nu F + 2 = n →

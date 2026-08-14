@@ -3,7 +3,7 @@ import project.Basic
 /-!
 # Lemma 1 (threat structure) and Corollary 2 (tempo)
 
-This file formalises §2 of `main.tex` up to and including Corollary 2:
+This file formalises §3 of `main.tex` up to and including Corollary 2:
 
 * Lemma 1 ("threat structure"): if `ν(S) = n - 1` then the set of cells completing `S`
   is exactly the rectangle `D_R × D_C`, and if `ν(S) ≤ n - 2` no single cell completes `S`;

@@ -7,7 +7,7 @@ At ply `2n - 3` X owns exactly the matching `M = nearMatching σ b` of size `n -
 `b` and column `d = σ b`, while O owns the `n - 2` stones `F`. This file formalises:
 
 * the notion of a **live** row of §4 (both `(s,d)` and `(b, σ s)` are free);
-* inequality (3.1) of `main.tex`: `ℓ ≥ (n-1) - w`;
+* inequality (4.1) of `main.tex`: `ℓ ≥ (n-1) - w`;
 * **Lemma 9** (admissible pair): if `w ≤ n - 3` then X can choose a pair `(r,s)` of distinct
   live rows whose cross cell is free, for either plan;
 * **Lemma 10** (admissible pair when `w = 0` and `ν(F) = n - 2`);
@@ -43,7 +43,7 @@ theorem cross_notMem_nearMatching {σ : Equiv.Perm (Fin n)} {b r s : Fin n} (hrs
   intro h
   exact hrs (σ.injective (mem_nearMatching.1 h).2.symm)
 
-/-- Inequality (3.1) of `main.tex`: the number `ℓ` of live rows satisfies
+/-- Inequality (4.1) of `main.tex`: the number `ℓ` of live rows satisfies
 `ℓ ≥ (n - 1) - w`, because each of the `w` O-stones in row `b` or column `d` kills at most one
 row. -/
 theorem card_live_ge {σ : Equiv.Perm (Fin n)} {b : Fin n} {F : Finset (Cell n)} :
