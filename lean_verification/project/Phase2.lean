@@ -185,7 +185,7 @@ theorem hasTransversal_insert_nearMatching {σ : Equiv.Perm (Fin n)} {b : Fin n}
     rw [hcomp]; rfl
   exact hmem
 
-/-- **Rule 8** (plan and pair) of `main.tex`, together with Lemmas 9, 10 and 12:
+/-- **Rule 4.3** (plan and pair) of `main.tex`, together with Lemmas 9, 10 and 12:
 after O's forced block of `(b,d)` at ply `2n-2`, X selects a plan according to whether the
 `n-2` O-stones `F` meet column `d` (case C-i), row `b` (case C-ii) or neither (case C-iii),
 and wins with three more stones.
