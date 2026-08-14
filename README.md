@@ -84,5 +84,3 @@ The development is organized to track the paper:
   primaryClass  = {math.CO}
 }
 ```
-
-MSC: 91A05, 05C57, 91A43, 91A46.
